@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--***************************************************************************
+*    Copyright (C), 2015 by HappyTown                                         *
+*    FileName:    gdbus-daemon.xml
+*    Author:      WangYing	                                             *
+*    Description:                                                             *
+*    History:                                                                 *
+*      <author>          <time>          <version>          <description>     *
+*        Xzj        2016-11-16 17:49      V1.0.0                build         *
+*                                                                             *
+****************************************************************************-->
+<node name="/service">
+	<interface name="com.dd.service">
+		<method name="ioctl">
+			<arg name="pin" type="s" direction="in"/>
+			<arg name="uin" type="u" direction="in"/>
+			<arg name="pout" type="s" direction="out"/>
+			<arg name="uout" type="u" direction="out"/>
+		</method>
+		<method name="test">
+			<arg name="pin" type="i" direction="in"/>
+			<arg name="pout" type="i" direction="out"/>
+		</method>
+		<signal name="notification">
+			<arg name="data" type="s"/>
+		</signal>
+		<signal name="test">
+			<arg name="data" type="i"/>
+		</signal>
+	</interface>
+</node>
