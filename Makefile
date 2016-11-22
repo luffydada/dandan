@@ -9,7 +9,6 @@
 .PHONY: cat prepare all app lib clean
 DD_ARM ?= no
 DD_ROOT_DIR ?= $(shell pwd)
-DD_OUTPUT_DIR ?= $(DD_ROOT_DIR)/output
 
 CROSS_COMPILE = /opt/arm-linux-gnueabihf/gcc-4.9/bin/arm-linux-gnueabihf-
 
@@ -26,17 +25,27 @@ ifeq ($(DD_ARM), yes)
 	DD_LDFLAGS := -L/opt/arm-linux-gnueabihf/lib 
 	DD_LDFLAGS += -L/opt/arm-linux-gnueabihf/usr/lib
 
-	DD_BUILD_DIR ?= $(DD_OUTPUT_DIR)/arm/bulid
+	DD_OUTPUT_DIR ?= $(DD_ROOT_DIR)/output/arm
+	DD_BUILD_DIR ?= $(DD_OUTPUT_DIR)/bulid
+	DD_OUTPUT_INCDIR ?= $(DD_OUTPUT_DIR)/include
 else
 	DD_CC := gcc
 	DD_CXX := g++
 
-	DD_CFLAGS += -I/usr/include
-	DD_CPPFLAGS += -I/usr/include
+#	DD_CFLAGS += -I/usr/include
+#	DD_CFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
+	DD_CFLAGS += -I/usr/local/include
+	DD_CFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
+#	DD_CPPFLAGS += -I/usr/include
+#	DD_CPPFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
+	DD_CPPFLAGS += -I/usr/local/include
+	DD_CPPFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
 
 	DD_LDFLAGS += -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
-	DD_BUILD_DIR ?= $(DD_OUTPUT_DIR)/pc/bulid
+	DD_OUTPUT_DIR ?= $(DD_ROOT_DIR)/output/pc
+	DD_BUILD_DIR ?= $(DD_OUTPUT_DIR)/bulid
+	DD_OUTPUT_INCDIR ?= $(DD_OUTPUT_DIR)/include
 endif
 
 DD_DIRS := kernel server type
@@ -47,10 +56,10 @@ DD_SRCS_C := $(wildcard server/*.c) \
 		$(wildcard kernel/*.c) \
 		$(wildcard type/*.c)
 
-DD_OBJS := $(patsubst %.cpp, $(DD_OUTPUT_DIR)/%.o, $(DD_SRCS))
-DD_OBJS += $(patsubst %.c, $(DD_OUTPUT_DIR)/%.o, $(DD_SRCS_C))
-DD_DEPS := $(patsubst %.cpp, $(DD_OUTPUT_DIR)/%.d, $(DD_SRCS))
-DD_DEPS += $(patsubst %.c, $(DD_OUTPUT_DIR)/%.d, $(DD_SRCS_C))
+DD_OBJS := $(patsubst %.cpp, $(DD_BUILD_DIR)/%.o, $(DD_SRCS))
+DD_OBJS += $(patsubst %.c, $(DD_BUILD_DIR)/%.o, $(DD_SRCS_C))
+DD_DEPS := $(patsubst %.cpp, $(DD_BUILD_DIR)/%.d, $(DD_SRCS))
+DD_DEPS += $(patsubst %.c, $(DD_BUILD_DIR)/%.d, $(DD_SRCS_C))
 
 TARGET_LIB := libdandan.so
 
@@ -69,17 +78,18 @@ cat :
 	@echo "DD_OBJS"=$(DD_OBJS)
 	@echo "DD_DEPS"=$(DD_DEPS)
 
-prepare : DD_BUILD_DEP_DIR = mkdir -p $(DD_BUILD_DIR)/$(ARG)
-prepare : DD_COMPILE_CPP_DEP = $(DD_CXX) -MM $(ARG) -o $(DD_BUILD_DIR)/$(subst .cpp,.d,$(ARG))
-prepare : DD_SED_OBJECT = sed -i "1i $(DB_BUILD_DIR)/$(ARG) \\\\" $(DB_BUILD_DIR)/$(DD_DEPS)
-prepare : DD_COMPILE_C_DEP = $(DD_CC) -MM $(ARG) -o $(DD_BUILD_DIR)/$(subst .c,.d,$(ARG))
+prepare: DD_SRC_NOEXT := $(basename $(DD_SRCS))
+prepare: DD_SRC_C_NOEXT := $(basename $(DD_SRCS_C))
 prepare :
-	$(foreach ARG, $(DD_DIRS), $(DD_BUILD_DEP_DIR))
-	$(foreach ARG, $(DD_SRCS), $(DD_COMPILE_CPP_DEP))
-	$(foreach ARG, $(DD_OBJS), $(DD_COMPILE_CPP_DEP))
-	$(foreach ARG, $(DD_SRCS_C), $(DD_COMPILE_C_DEP))
-	@for j in $(DB_SRC_NOEXT); do sed -i "1i $(DB_BUILD_DIR)/$$j.o \\\\" $(DB_BUILD_DIR)/$$j.d; done
-	@for j in $(DB_SRC_NOEXT); do echo '\t$$(DB_CXX) $$(DB_CPPFLAGS) -c $$< -o $$@' >> $(DB_BUILD_DIR)/$$j.d; done
+	for i in $(DD_DIRS); do mkdir -p $(DD_OUTPUT_INCDIR)/$$i; done
+	for i in $(DD_DIRS); do mkdir -p $(DD_BUILD_DIR)/$$i; done
+	for i in $(DD_SRC_NOEXT); do $(DD_CXX) -MM $(DD_ROOT_DIR)/$$i.cpp -o $(DD_BUILD_DIR)/$$i.d; done
+	for j in $(DD_SRC_NOEXT); do sed -i "1i $(DD_BUILD_DIR)/$$j.o \\\\" $(DD_BUILD_DIR)/$$j.d; done
+	for j in $(DD_SRC_NOEXT); do echo '\t$$(DD_CXX) $$(DD_CPPFLAGS) -c $$< -o $$@' >> $(DD_BUILD_DIR)/$$j.d; done
+	for i in $(DD_SRC_C_NOEXT); do $(DD_CC) -MM $(DD_ROOT_DIR)/$$i.c -o $(DD_BUILD_DIR)/$$i.d; done
+	for j in $(DD_SRC_C_NOEXT); do sed -i "1i $(DD_BUILD_DIR)/$$j.o \\\\" $(DD_BUILD_DIR)/$$j.d; done
+	for j in $(DD_SRC_C_NOEXT); do echo '\t$$(DD_CC) $$(DD_CPPFLAGS) -c $$< -o $$@' >> $(DD_BUILD_DIR)/$$j.d; done
+	echo make depend sucess.
 
 all : lib app
 	
@@ -90,11 +100,15 @@ lib : $(DD_OBJS)
 
 app : server client 
 
+server : DD_LDFLAGS += -L$(DD_OUTPUT_DIR)
+server : DD_LIBS += -ldandan
 server : $(OBJECTS_APP_SERVER)
-	$(DD_CXX) -o $(TARGET_APP_SERVER) $^ $(DD_LDFLAGS) $(DD_LIBS) -ldandan 
+	$(DD_CXX) -o $(DD_OUTPUT_DIR)/$(TARGET_APP_SERVER) $^ $(DD_LDFLAGS) $(DD_LIBS) 
 
+client : DD_LDFLAGS += -L$(DD_OUTPUT_DIR)
+client : DD_LIBS += -ldandan
 client : $(OBJECTS_APP_CLIENT)
-	$(DD_CXX) -o $(TARGET_APP_CLIENT) $^ $(DD_LDFLAGS) $(DD_LIBS) -ldandan 
+	$(DD_CXX) -o $(DD_OUTPUT_DIR)/$(TARGET_APP_CLIENT) $^ $(DD_LDFLAGS) $(DD_LIBS) 
 
 clean:
 	-rm $(TARGET_APP) $(TARGET_LIB)

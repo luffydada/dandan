@@ -10,5 +10,26 @@
 ******************************************************************************/
 #include "dandan.h"
 
-class ddClientTest::ddApp {
+class ddClientTest: public ddApp {
+public:
+	ddClientTest()
+	{
+	}
+
+	~ddClientTest()
+	{
+	}
+
+	virtual ddVoid onInitApp()
+	{
+		printf("dddClientTest,onInitApp\n");
+	}
+};
+
+int main(int argc, char *argv[])
+{
+	ddClientTest client;
+	client.run();
+	return 0;
 }
+

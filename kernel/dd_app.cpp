@@ -1,13 +1,11 @@
-/******************************************************************************
-*    Copyright (C), 2015 by HappyTown                                         *
-*    FileName:    dd_app.cpp
-*    Author:      WangYing	                                             *
-*    Description:                                                             *
-*    History:                                                                 *
-*      <author>          <time>          <version>          <description>     *
-*        Xzj        2016-11-22 14:14      V1.0.0                build         *
-*                                                                             *
-******************************************************************************/
+/***************************************************************************
+*    File name:        dd_app.cpp
+*    Description:
+*    Create date:      2016-11-22 21:47
+*    Modified date:    2016-11-22 21:47
+*    Version:          V1.0
+*    Author:           wangying
+***************************************************************************/
 #include <glib-2.0/glib.h>
 
 #include "../dandan.h"

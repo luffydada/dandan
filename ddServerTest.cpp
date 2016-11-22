@@ -10,7 +10,8 @@
 ******************************************************************************/
 #include "dandan.h"
 
-class ddServerTest::ddApp {
+class ddServerTest : public ddApp {
+public:
 	ddServerTest()
 	{
 	}
