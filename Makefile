@@ -71,15 +71,23 @@ cat :
 
 prepare : DD_BUILD_DEP_DIR = mkdir -p $(DD_BUILD_DIR)/$(ARG)
 prepare : DD_COMPILE_CPP_DEP = $(DD_CXX) -MM $(ARG) -o $(DD_BUILD_DIR)/$(subst .cpp,.d,$(ARG))
+prepare : DD_SED_OBJECT = sed -i "1i $(DB_BUILD_DIR)/$(ARG) \\\\" $(DB_BUILD_DIR)/$(DD_DEPS)
 prepare : DD_COMPILE_C_DEP = $(DD_CC) -MM $(ARG) -o $(DD_BUILD_DIR)/$(subst .c,.d,$(ARG))
 prepare :
 	$(foreach ARG, $(DD_DIRS), $(DD_BUILD_DEP_DIR))
 	$(foreach ARG, $(DD_SRCS), $(DD_COMPILE_CPP_DEP))
+	$(foreach ARG, $(DD_OBJS), $(DD_COMPILE_CPP_DEP))
 	$(foreach ARG, $(DD_SRCS_C), $(DD_COMPILE_C_DEP))
+	@for j in $(DB_SRC_NOEXT); do sed -i "1i $(DB_BUILD_DIR)/$$j.o \\\\" $(DB_BUILD_DIR)/$$j.d; done
+	@for j in $(DB_SRC_NOEXT); do echo '\t$$(DB_CXX) $$(DB_CPPFLAGS) -c $$< -o $$@' >> $(DB_BUILD_DIR)/$$j.d; done
 
--include $(DD_DEPS)
 all : lib app
 	
+lib : $(DD_OBJS)
+	$(DD_CXX) -shared -o $(DD_OUTPUT_DIR)/$(TARGET_LIB) $^ $(DD_LDFLAGS) $(DD_LIBS)
+
+-include $(DD_DEPS)
+
 app : server client 
 
 server : $(OBJECTS_APP_SERVER)
@@ -87,9 +95,6 @@ server : $(OBJECTS_APP_SERVER)
 
 client : $(OBJECTS_APP_CLIENT)
 	$(DD_CXX) -o $(TARGET_APP_CLIENT) $^ $(DD_LDFLAGS) $(DD_LIBS) -ldandan 
-
-lib : $(DD_OBJS)
-	$(DD_CXX) -shared -o $(DD_OUTPUT_DIR)/$(TARGET_LIB) $^ $(DD_LDFLAGS) $(DD_LIBS)
 
 clean:
 	-rm $(TARGET_APP) $(TARGET_LIB)
