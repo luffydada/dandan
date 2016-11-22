@@ -50,8 +50,8 @@ typedef ddBool *				ddpBool;
 typedef const ddBool *			ddpCBool;
 typedef ddInt *					ddpInt;
 typedef const ddInt *			ddpCInt;
-typedef ddUint *				ddpUint;
-typedef const ddUint *			ddpCUint;
+typedef ddUInt *				ddpUInt;
+typedef const ddUInt *			ddpCUInt;
 typedef ddShort *				ddpShort;
 typedef const ddShort *			ddpCShort;
 typedef ddLong *				ddpLong;
@@ -77,5 +77,17 @@ typedef const ddDouble *		ddpCDouble;
  */
 /* --------------------------------------------------------------------------*/
 #define stricmp strcasecmp
+
+/* --------------------------------------------------------------------------*/
+/**
+ * @synopsis: 函数统一宏定义
+ */
+/* --------------------------------------------------------------------------*/
+class dbPrivateBase {
+public:
+	dbPrivateBase();
+	~dbPrivateBase();
+	virtual ddPointer getInstatnce()=0;
+};
 
 #endif //dd_type.h

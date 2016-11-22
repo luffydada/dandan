@@ -9,6 +9,12 @@
 #ifndef __dandan_h__
 #define __dandan_h__
 
-#include "server/dd_type.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "type/dd_type.h"
+
+#include "kernel/dd_app.h"
 
 #endif //dandan.h

@@ -2,14 +2,13 @@
 tags
 Makefile~
 makefile~
+*.so
+*.swp
 
 # c++:
-*.h
-*.cpp
-*.so
 
 #dir
-backup
-v1
+output
 
 # My configurations:
+.gitignore~
