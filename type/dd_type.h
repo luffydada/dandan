@@ -78,16 +78,42 @@ typedef const ddDouble *		ddpCDouble;
 /* --------------------------------------------------------------------------*/
 #define stricmp strcasecmp
 
-/* --------------------------------------------------------------------------*/
-/**
- * @synopsis: 函数统一宏定义
- */
-/* --------------------------------------------------------------------------*/
-class dbPrivateBase {
-public:
-	dbPrivateBase();
-	~dbPrivateBase();
-	virtual ddPointer getInstatnce()=0;
+class ddPrivateBase { public: ddPrivateBase(){} virtual ~ddPrivateBase(){} };
+
+#define DD_PRIVATE_DECLARE(Class) \
+	friend class Class##Private; \
+	public: inline Class##Private *dPtr() const { return m_pPrivate; } \
+	private: Class##Private *m_pPrivate;
+
+#define DD_PUBLIC_DECLARE(Class) \
+	friend class Class; \
+	public: inline Class *bPtr() const { return m_pBase; } \
+	private: Class *m_pBase;
+
+#define DD_D_NEW(Class) m_pPrivate = new Class(); m_pPrivate->m_pBase = this
+#define DD_D_DELETE() if ( m_pPrivate ) delete m_pPrivate
+
+///< 全局模板类
+template <class T>
+class ddGlobalInstance {
+	ddGlobalInstance() {}
+	~ddGlobalInstance() { release(); }
+	static T *getInstance() {
+		if ( !s_pInstance ) {
+			s_pInstance = new T();
+		}
+		return s_pInstance;
+	}
+	static ddVoid release() {
+		if ( s_pInstance ) {
+			delete s_pInstance;
+			s_pInstance = nil;
+		}
+	}
+
+private:
+	static T *s_pInstance;
 };
+template <class T> T *ddGlobalInstance<T>::s_pInstance = nil;
 
 #endif //dd_type.h

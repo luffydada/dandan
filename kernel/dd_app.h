@@ -9,7 +9,9 @@
 #ifndef dd_app_h
 #define dd_app_h
 
+class ddAppPrivate;
 class ddApp {
+	DD_PRIVATE_DECLARE(ddApp)
 public:
 	ddApp();
 	~ddApp();

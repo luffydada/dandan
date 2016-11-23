@@ -10,71 +10,47 @@
 
 #include "../dandan.h"
 
-class ddAppPrivate {
-private:
-	static ddAppPrivate *s_pThis;
-	static ddApp *s_pOwn;
+class ddAppPrivate : public ddPrivateBase, public ddTimer::interface {
+	DD_PUBLIC_DECLARE(ddApp)
 public:
-	static ddAppPrivate *getInstance()
-	{
-		if ( !s_pThis ) {
-			s_pThis = new ddAppPrivate();
-		}
-		return s_pThis;
-	}
-	void release()
-	{
-		if ( s_pThis ) {
-			delete s_pThis;
-			s_pThis = nil;
-		}
-	}
-	static void setOwn(ddApp* pOwn)
-   	{
-		s_pOwn = pOwn;
-	}
-
-public:
-	ddAppPrivate()
-   	{
+	ddAppPrivate() :m_timer(this) {
 		m_pMainLoop = g_main_loop_new(nil, no);
+		m_timer.setTimer(5);
 	}
 
-	~ddAppPrivate()
-   	{
+	~ddAppPrivate() {
 		if ( m_pMainLoop ) {
 			g_main_loop_unref(m_pMainLoop);
 		}
-		release();
 	}
 
-	ddVoid run()
-	{
-		if ( s_pOwn ) {
-			s_pOwn->onInitApp();
-		}
+	ddVoid run() {
 		g_main_loop_run(m_pMainLoop);
 	}
 
-	ddVoid quit()
-	{
+	ddVoid quit() {
 		g_main_loop_quit(m_pMainLoop);
+	}
+
+	virtual ddVoid onTimer(ddUInt uTimerId) {
+		if ( m_timer.isMe(uTimerId) ) {
+			bPtr()->onInitApp();
+		}
 	}
 
 private:
 	GMainLoop *m_pMainLoop;
+	ddTimer m_timer;
 };
-
-ddAppPrivate *ddAppPrivate::s_pThis = nil;
-ddApp *ddAppPrivate::s_pOwn = nil;
 
 ddApp::ddApp()
 {
-	ddAppPrivate::getInstance();
+	DD_D_NEW(ddAppPrivate);
 }
 
 ddApp::~ddApp()
 {
+	DD_D_DELETE();
 }
 
 ddVoid ddApp::onInitApp()
@@ -83,10 +59,10 @@ ddVoid ddApp::onInitApp()
 
 ddVoid ddApp::run()
 {
-	ddAppPrivate::getInstance()->run();
+	dPtr()->run();
 }
 
 ddVoid ddApp::quit()
 {
-	ddAppPrivate::getInstance()->quit();
+	dPtr()->quit();
 }

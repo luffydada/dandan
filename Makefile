@@ -6,7 +6,7 @@
 #    Version:          V1.0
 #    Author:           wangying
 #**************************************************************************/
-.PHONY: cat prepare all app lib clean
+.PHONY: all app lib prepare cat clean
 DD_ARM ?= no
 DD_ROOT_DIR ?= $(shell pwd)
 
@@ -32,14 +32,14 @@ else
 	DD_CC := gcc
 	DD_CXX := g++
 
-#	DD_CFLAGS += -I/usr/include
-#	DD_CFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
-	DD_CFLAGS += -I/usr/local/include
-	DD_CFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
-#	DD_CPPFLAGS += -I/usr/include
-#	DD_CPPFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
-	DD_CPPFLAGS += -I/usr/local/include
-	DD_CPPFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
+	DD_CFLAGS += -I/usr/include
+	DD_CFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
+#	DD_CFLAGS += -I/usr/local/include
+#	DD_CFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
+	DD_CPPFLAGS += -I/usr/include
+	DD_CPPFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
+#	DD_CPPFLAGS += -I/usr/local/include
+#	DD_CPPFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
 
 	DD_LDFLAGS += -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
@@ -69,6 +69,7 @@ TARGET_APP_SERVER := ddServerTest
 TARGET_APP_CLIENT := ddClientTest
 TARGET_APP := $(TARGET_APP_SERVER) $(TARGET_APP_CLIENT)
 
+all : lib app
 cat :
 	@echo "DD_ROOT_DIR"=$(DD_ROOT_DIR)
 	@echo "DD_OUTPUT_DIR"=$(DD_OUTPUT_DIR)
@@ -90,8 +91,6 @@ prepare :
 	for j in $(DD_SRC_C_NOEXT); do sed -i "1i $(DD_BUILD_DIR)/$$j.o \\\\" $(DD_BUILD_DIR)/$$j.d; done
 	for j in $(DD_SRC_C_NOEXT); do echo '\t$$(DD_CC) $$(DD_CPPFLAGS) -c $$< -o $$@' >> $(DD_BUILD_DIR)/$$j.d; done
 	echo make depend sucess.
-
-all : lib app
 	
 lib : $(DD_OBJS)
 	$(DD_CXX) -shared -o $(DD_OUTPUT_DIR)/$(TARGET_LIB) $^ $(DD_LDFLAGS) $(DD_LIBS)
