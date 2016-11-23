@@ -24,12 +24,13 @@ public:
 		printf("ddServerTest,onInitApp\n");
 	}
 		
-	virtual ddVoid onTimer(ddUInt uTimerId) {
+	virtual ddUInt onTimer(ddUInt uTimerId) {
 		if ( timer1.isMe(uTimerId) ) {
 			printf("ddServerTest,onTimer,time1\n");
 		} else if ( timer2.isMe(uTimerId) ) {
 			printf("ddServerTest,onTimer,time2\n");
 		}
+		return 0;
 	}
 
 private:

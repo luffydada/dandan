@@ -1,13 +1,11 @@
-/******************************************************************************
-*    Copyright (C), 2015 by HappyTown                                         *
-*    FileName:    dd_timer.h
-*    Author:      WangYing	                                             *
-*    Description:                                                             *
-*    History:                                                                 *
-*      <author>          <time>          <version>          <description>     *
-*        Xzj        2016-11-23 14:47      V1.0.0                build         *
-*                                                                             *
-******************************************************************************/
+/***************************************************************************
+*    File name:        dd_timer.h
+*    Description:
+*    Create date:      2016-11-23 21:38
+*    Modified date:    2016-11-23 21:38
+*    Version:          V1.0
+*    Author:           wangying
+***************************************************************************/
 #ifndef dd_timer_h
 #define dd_timer_h
 
@@ -15,10 +13,10 @@ class ddTimerPrivate;
 class ddTimer {
 	DD_PRIVATE_DECLARE(ddTimer)
 public:
-	class DANDAN_EXPORT interface {
+	class interface {
 	public:
 		virtual ~interface() {}
-		virtual ddVoid onTimer(ddUInt uTimerId) {}
+		virtual ddUInt onTimer(ddUInt uTimerId) { return uTimerId; }
 	};
 
 	ddTimer(interface *pOwner = nil);

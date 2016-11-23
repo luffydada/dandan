@@ -32,14 +32,14 @@ else
 	DD_CC := gcc
 	DD_CXX := g++
 
-	DD_CFLAGS += -I/usr/include
-	DD_CFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
-#	DD_CFLAGS += -I/usr/local/include
-#	DD_CFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
-	DD_CPPFLAGS += -I/usr/include
-	DD_CPPFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
-#	DD_CPPFLAGS += -I/usr/local/include
-#	DD_CPPFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
+#	DD_CFLAGS += -I/usr/include
+#	DD_CFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
+	DD_CFLAGS += -I/usr/local/include
+	DD_CFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
+#	DD_CPPFLAGS += -I/usr/include
+#	DD_CPPFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
+	DD_CPPFLAGS += -I/usr/local/include
+	DD_CPPFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
 
 	DD_LDFLAGS += -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 

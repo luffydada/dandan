@@ -1,13 +1,11 @@
-/******************************************************************************
-*    Copyright (C), 2015 by HappyTown                                         *
-*    FileName:    dd_timer.cpp
-*    Author:      WangYing	                                             *
-*    Description:                                                             *
-*    History:                                                                 *
-*      <author>          <time>          <version>          <description>     *
-*        Xzj        2016-11-23 14:47      V1.0.0                build         *
-*                                                                             *
-******************************************************************************/
+/***************************************************************************
+*    File name:        dd_timer.cpp
+*    Description:
+*    Create date:      2016-11-23 21:38
+*    Modified date:    2016-11-23 21:38
+*    Version:          V1.0
+*    Author:           wangying
+***************************************************************************/
 #include <glib-2.0/glib.h>
 #include "../dandan.h"
 

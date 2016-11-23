@@ -4,6 +4,7 @@ Makefile~
 makefile~
 *.so
 *.swp
+.o
 
 # c++:
 
