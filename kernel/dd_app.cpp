@@ -15,17 +15,22 @@ class ddAppPrivate : public ddPrivateBase, public ddTimer::interface {
 public:
 	ddAppPrivate() :m_timer(this) {
 		m_pMainLoop = g_main_loop_new(nil, no);
+		m_pMainContext = g_main_loop_get_context(m_pMainLoop);
 		m_timer.setTimer(5);
 	}
 
 	~ddAppPrivate() {
+		if ( m_pMainContext ) {
+			g_main_context_unref(m_pMainContext);
+		}
 		if ( m_pMainLoop ) {
 			g_main_loop_unref(m_pMainLoop);
 		}
 	}
 
-	ddVoid run() {
+	ddInt run() {
 		g_main_loop_run(m_pMainLoop);
+		return 0;
 	}
 
 	ddVoid quit() {
@@ -41,6 +46,7 @@ public:
 
 private:
 	GMainLoop *m_pMainLoop;
+	GMainContext* m_pMainContext;
 	ddTimer m_timer;
 };
 
@@ -58,12 +64,17 @@ ddVoid ddApp::onInitApp()
 {
 }
 
-ddVoid ddApp::run()
+ddInt ddApp::run()
 {
-	dPtr()->run();
+	return dPtr()->run();
 }
 
 ddVoid ddApp::quit()
 {
 	dPtr()->quit();
 }
+ddVoid ddApp::startup(ddpCChar pName, ddBool isServer/* = no*/)
+{
+	ddService::startup(pName, isServer);
+}
+

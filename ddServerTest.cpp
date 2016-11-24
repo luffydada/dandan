@@ -40,8 +40,8 @@ private:
 
 int main(int argc, char *argv[])
 {
+	ddServerTest::startup("client", yes);
 	ddServerTest server;
-	server.run();
-	return 0;
+	return server.run();
 }
 

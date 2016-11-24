@@ -15,8 +15,10 @@ class ddService {
 public:
 	ddService();
 	~ddService();
-	ddInt ddService::execsh(ddpCChar cmd, std::vector<std::string> &resvec)
-	ddVoid startup(ddpCChar pName, ddBool isServer = no);
+	static ddInt execsh(ddpCChar cmd, std::vector<std::string> &resvec);
+	static ddVoid startupServer();
+	static ddVoid startup(ddpCChar pName, ddBool isServer = no);
+	static ddVoid ioctl(ddpCByte pin, ddUInt16 uin, ddpByte pout = nil, ddUInt16 uout = 0);
 };
 
 #endif // dd_service_h

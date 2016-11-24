@@ -38,6 +38,7 @@ typedef float					ddFloat;
 typedef double					ddDouble;
 
 typedef ddVoid *				ddPointer;
+typedef const ddVoid *			ddCPointer;
 typedef ddChar *				ddpChar;
 typedef const ddChar *			ddpCChar;
 typedef ddUChar *				ddpUChar;
@@ -96,9 +97,10 @@ class ddPrivateBase { public: ddPrivateBase(){} virtual ~ddPrivateBase(){} };
 ///< 全局模板类
 template <class T>
 class ddGlobalInstance {
+public:
 	ddGlobalInstance() {}
 	~ddGlobalInstance() { release(); }
-	static T *getInstance() {
+	static T *instance() {
 		if ( !s_pInstance ) {
 			s_pInstance = new T();
 		}
@@ -115,5 +117,6 @@ private:
 	static T *s_pInstance;
 };
 template <class T> T *ddGlobalInstance<T>::s_pInstance = nil;
+#define DD_GLOBAL_INSTANCE_DO(t, f) if ( ddGlobalInstance<t>::instance() ) ddGlobalInstance<t>::instance()->f
 
 #endif //dd_type.h

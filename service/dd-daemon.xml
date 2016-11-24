@@ -15,7 +15,7 @@
 			<arg name="pin" type="s" direction="in"/>
 			<arg name="uin" type="u" direction="in"/>
 			<arg name="pout" type="s" direction="out"/>
-			<arg name="uout" type="u" direction="out"/>
+			<arg name="uout" type="u" direction="in"/>
 		</method>
 		<method name="test">
 			<arg name="pin" type="i" direction="in"/>

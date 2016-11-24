@@ -22,14 +22,14 @@ public:
 
 	virtual ddVoid onInitApp()
 	{
-		printf("dddClientTest,onInitApp\n");
+		printf("ddClientTest,onInitApp\n");
 	}
 };
 
 int main(int argc, char *argv[])
 {
 	ddClientTest client;
-	client.run();
-	return 0;
+	ddClientTest::startup("client");
+	return client.run();
 }
 

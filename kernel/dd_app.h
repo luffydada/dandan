@@ -16,7 +16,8 @@ public:
 	ddApp();
 	~ddApp();
 	virtual ddVoid onInitApp();
-	ddVoid run();
+	static ddVoid startup(ddpCChar pName, ddBool isServer = no);
+	ddInt run();
 	ddVoid quit();
 };
 

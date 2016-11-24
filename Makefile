@@ -6,7 +6,7 @@
 #    Version:          V1.0
 #    Author:           wangying
 #**************************************************************************/
-.PHONY: all app lib prepare cat clean
+.PHONY: all test lib prepare cat clean
 DD_ARM ?= no
 DD_ROOT_DIR ?= $(shell pwd)
 
@@ -19,11 +19,13 @@ ifeq ($(DD_ARM), yes)
 	DD_CC := $(CROSS_COMPILE)gcc
 	DD_CXX := $(CROSS_COMPILE)g++
 
-	DD_CFLAGS += -I/opt/arm-linux-gnueabihf/usr/include
-	DD_CPPFLAGS += -I/opt/arm-linux-gnueabihf/usr/include
+	DD_CFLAGS += -I/opt/arm-linux-gnueabihf/usr/include -I/opt/arm-linux-gnueabihf/usr/include/gio-unix-2.0
+	DD_CPPFLAGS += -I/opt/arm-linux-gnueabihf/usr/include -I/opt/arm-linux-gnueabihf/usr/include/gio-unix-2.0
 
 	DD_LDFLAGS := -L/opt/arm-linux-gnueabihf/lib 
 	DD_LDFLAGS += -L/opt/arm-linux-gnueabihf/usr/lib
+
+	DD_LIBS += -lgmodule-2.0 -lgobject-2.0 -lz -lffi
 
 	DD_OUTPUT_DIR ?= $(DD_ROOT_DIR)/output/arm
 	DD_BUILD_DIR ?= $(DD_OUTPUT_DIR)/bulid
@@ -32,14 +34,14 @@ else
 	DD_CC := gcc
 	DD_CXX := g++
 
-#	DD_CFLAGS += -I/usr/include
-#	DD_CFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
-	DD_CFLAGS += -I/usr/local/include
-	DD_CFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
-#	DD_CPPFLAGS += -I/usr/include
-#	DD_CPPFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
-	DD_CPPFLAGS += -I/usr/local/include
-	DD_CPPFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
+	DD_CFLAGS += -I/usr/include -I/usr/include/c++/4.8
+	DD_CFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
+#	DD_CFLAGS += -I/usr/local/include -I/usr/include/c++/4.8
+#	DD_CFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
+	DD_CPPFLAGS += -I/usr/include -I/usr/include/c++/4.8
+	DD_CPPFLAGS += -I/usr/include/glib-2.0 -I/usr/include/gio-unix-2.0
+#	DD_CPPFLAGS += -I/usr/local/include -I/usr/include/c++/4.8
+#	DD_CPPFLAGS += -I/usr/local/include/glib-2.0 -I/usr/local/include/gio-unix-2.0
 
 	DD_LDFLAGS += -L/usr/lib -L/usr/lib/x86_64-linux-gnu
 
@@ -48,11 +50,11 @@ else
 	DD_OUTPUT_INCDIR ?= $(DD_OUTPUT_DIR)/include
 endif
 
-DD_DIRS := kernel server type
-DD_SRCS := $(wildcard server/*.cpp) \
+DD_DIRS := kernel service type
+DD_SRCS := $(wildcard service/*.cpp) \
 		$(wildcard kernel/*.cpp) \
 		$(wildcard type/*.cpp)
-DD_SRCS_C := $(wildcard server/*.c) \
+DD_SRCS_C := $(wildcard service/*.c) \
 		$(wildcard kernel/*.c) \
 		$(wildcard type/*.c)
 
@@ -63,13 +65,7 @@ DD_DEPS += $(patsubst %.c, $(DD_BUILD_DIR)/%.d, $(DD_SRCS_C))
 
 TARGET_LIB := libdandan.so
 
-OBJECTS_APP_SERVER := ddServerTest.o
-OBJECTS_APP_CLIENT := ddClientTest.o
-TARGET_APP_SERVER := ddServerTest
-TARGET_APP_CLIENT := ddClientTest
-TARGET_APP := $(TARGET_APP_SERVER) $(TARGET_APP_CLIENT)
-
-all : lib app
+all : lib test
 cat :
 	@echo "DD_ROOT_DIR"=$(DD_ROOT_DIR)
 	@echo "DD_OUTPUT_DIR"=$(DD_OUTPUT_DIR)
@@ -97,17 +93,11 @@ lib : $(DD_OBJS)
 
 -include $(DD_DEPS)
 
-app : server client 
-
-server : DD_LDFLAGS += -L$(DD_OUTPUT_DIR)
-server : DD_LIBS += -ldandan
-server : $(OBJECTS_APP_SERVER)
-	$(DD_CXX) -o $(DD_OUTPUT_DIR)/$(TARGET_APP_SERVER) $^ $(DD_LDFLAGS) $(DD_LIBS) 
-
-client : DD_LDFLAGS += -L$(DD_OUTPUT_DIR)
-client : DD_LIBS += -ldandan
-client : $(OBJECTS_APP_CLIENT)
-	$(DD_CXX) -o $(DD_OUTPUT_DIR)/$(TARGET_APP_CLIENT) $^ $(DD_LDFLAGS) $(DD_LIBS) 
+test : DD_LDFLAGS += -L$(DD_OUTPUT_DIR)
+test : DD_LIBS += -ldandan
+test : ddServerTest.cpp ddClientTest.cpp
+	$(DD_CXX) $(DD_CPPFLAGS) ddServerTest.cpp -o $(DD_OUTPUT_DIR)/ddServer $(DD_LDFLAGS) $(DD_LIBS) 
+	$(DD_CXX) $(DD_CPPFLAGS) ddClientTest.cpp -o $(DD_OUTPUT_DIR)/ddClient $(DD_LDFLAGS) $(DD_LIBS) 
 
 clean:
 	-rm $(TARGET_APP) $(TARGET_LIB)
