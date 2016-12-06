@@ -69,11 +69,10 @@ public:
 			}
 		} else {
 			/** Second step: try to get a connection to the given bus.*/
-			g_print("Second step\n");
 			GError *pProxyError = nil;
 			pthis->m_pService = com_dd_service_proxy_new_sync(connection, G_DBUS_PROXY_FLAGS_NONE,
 					pthis->busName(), pthis->objectPath(), nil, &pProxyError);
-			if ( !pProxyError ){
+			if ( pProxyError ) {
 				g_print("ddService,onGBusAcquiredCallback,failed to create proxy,error:%s\n", pProxyError->message);
 				g_error_free(pProxyError);
 			}
@@ -81,7 +80,6 @@ public:
 				return;
 			}
 
-			g_print("Third step\n");
 			/** Third step: Attach to dbus signals */
 //			g_signal_connect(pthis->m_pService, "notify::g-name-owner", G_CALLBACK(cb_OwnerNameChangedNotify), NULL);
 			g_signal_connect(pthis->m_pService, "notification", G_CALLBACK(on_notification), NULL);
@@ -142,7 +140,7 @@ public:
 		g_print("ddService,on_test,arg_data:%d\n", arg_data);
 	}
 
-	ddServicePrivate() :m_isServer(no), m_busWatchId(0), m_busOwnId(0) {
+	ddServicePrivate() :m_isServer(no), m_busWatchId(0), m_busOwnId(0), m_pService(nil) {
 	}
 
 	~ddServicePrivate() {
@@ -160,7 +158,7 @@ public:
 	ddVoid startup(ddpCChar pName, ddBool isServer) {
 		m_isServer = isServer;
 		m_strName = pName;
-		m_busWatchId = g_bus_watch_name (G_BUS_TYPE_SESSION, isServer ? busName() : uniqueName(pName),
+		m_busWatchId = g_bus_watch_name (G_BUS_TYPE_SESSION, busName(),
 				  G_BUS_NAME_WATCHER_FLAGS_NONE,
                   onGBusNameAppearedCallback,
                   onGBusNameVanishedCallback,
