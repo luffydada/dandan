@@ -18,7 +18,7 @@ public:
 	static ddInt execsh(ddpCChar cmd, std::vector<std::string> &resvec);
 	static ddVoid startupServer();
 	static ddVoid startup(ddpCChar pName, ddBool isServer = no);
-	static ddVoid ioctl(ddpCByte pin, ddUInt16 uin, ddpByte pout = nil, ddUInt16 uout = 0);
+	static ddVoid ioctl(ddUInt32 iocode, ddCPointer pin, ddUInt16 uin, ddPointer pout = nil, ddUInt16 uout = 0);
 };
 
 #endif // dd_service_h

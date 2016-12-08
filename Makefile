@@ -12,8 +12,8 @@ DD_ROOT_DIR ?= $(shell pwd)
 
 CROSS_COMPILE = /opt/arm-linux-gnueabihf/gcc-4.9/bin/arm-linux-gnueabihf-
 
-DD_CFLAGS := -g -Wall -W -fPIC
-DD_CPPFLAGS := -g -Wall -W -fPIC
+DD_CFLAGS := -g -Wall -fPIC
+DD_CPPFLAGS := -g -Wall -fPIC
 DD_LIBS := -lglib-2.0 -lgio-2.0
 ifeq ($(DD_ARM), yes)
 	DD_CC := $(CROSS_COMPILE)gcc
@@ -89,7 +89,7 @@ prepare :
 	echo make depend sucess.
 	
 lib : $(DD_OBJS)
-	$(DD_CXX) -shared -o $(DD_OUTPUT_DIR)/$(TARGET_LIB) $^ $(DD_LDFLAGS) $(DD_LIBS)
+	$(DD_CXX) $(DD_CPPFLAGS) -shared -o $(DD_OUTPUT_DIR)/$(TARGET_LIB) $^ $(DD_LDFLAGS) $(DD_LIBS)
 
 -include $(DD_DEPS)
 

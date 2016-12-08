@@ -163,12 +163,23 @@ _g_value_equal (const GValue *a, const GValue *b)
 
 /* ---- Introspection data for com.dd.service ---- */
 
+static const _ExtendedGDBusArgInfo _com_dd_service_method_info_ioctl_IN_ARG_iocode =
+{
+  {
+    -1,
+    (gchar *) "iocode",
+    (gchar *) "u",
+    NULL
+  },
+  FALSE
+};
+
 static const _ExtendedGDBusArgInfo _com_dd_service_method_info_ioctl_IN_ARG_pin =
 {
   {
     -1,
     (gchar *) "pin",
-    (gchar *) "s",
+    (gchar *) "ay",
     NULL
   },
   TRUE
@@ -198,6 +209,7 @@ static const _ExtendedGDBusArgInfo _com_dd_service_method_info_ioctl_IN_ARG_uout
 
 static const _ExtendedGDBusArgInfo * const _com_dd_service_method_info_ioctl_IN_ARG_pointers[] =
 {
+  &_com_dd_service_method_info_ioctl_IN_ARG_iocode,
   &_com_dd_service_method_info_ioctl_IN_ARG_pin,
   &_com_dd_service_method_info_ioctl_IN_ARG_uin,
   &_com_dd_service_method_info_ioctl_IN_ARG_uout,
@@ -209,7 +221,7 @@ static const _ExtendedGDBusArgInfo _com_dd_service_method_info_ioctl_OUT_ARG_pou
   {
     -1,
     (gchar *) "pout",
-    (gchar *) "s",
+    (gchar *) "ay",
     NULL
   },
   TRUE
@@ -293,7 +305,7 @@ static const _ExtendedGDBusArgInfo _com_dd_service_signal_info_notification_ARG_
   {
     -1,
     (gchar *) "data",
-    (gchar *) "s",
+    (gchar *) "ay",
     NULL
   },
   TRUE
@@ -424,6 +436,7 @@ com_dd_service_default_init (ComDdServiceIface *iface)
    * ComDdService::handle-ioctl:
    * @object: A #ComDdService.
    * @invocation: A #GDBusMethodInvocation.
+   * @arg_iocode: Argument passed by remote caller.
    * @arg_pin: Argument passed by remote caller.
    * @arg_uin: Argument passed by remote caller.
    * @arg_uout: Argument passed by remote caller.
@@ -442,8 +455,8 @@ com_dd_service_default_init (ComDdServiceIface *iface)
     NULL,
     g_cclosure_marshal_generic,
     G_TYPE_BOOLEAN,
-    4,
-    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_VARIANT, G_TYPE_UINT, G_TYPE_UINT);
+    5,
+    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_UINT, G_TYPE_VARIANT, G_TYPE_UINT, G_TYPE_UINT);
 
   /**
    * ComDdService::handle-test:
@@ -542,6 +555,7 @@ com_dd_service_emit_test (
 /**
  * com_dd_service_call_ioctl:
  * @proxy: A #ComDdServiceProxy.
+ * @arg_iocode: Argument to pass with the method invocation.
  * @arg_pin: Argument to pass with the method invocation.
  * @arg_uin: Argument to pass with the method invocation.
  * @arg_uout: Argument to pass with the method invocation.
@@ -558,6 +572,7 @@ com_dd_service_emit_test (
 void
 com_dd_service_call_ioctl (
     ComDdService *proxy,
+    guint arg_iocode,
     GVariant *arg_pin,
     guint arg_uin,
     guint arg_uout,
@@ -567,7 +582,8 @@ com_dd_service_call_ioctl (
 {
   g_dbus_proxy_call (G_DBUS_PROXY (proxy),
     "ioctl",
-    g_variant_new ("(@suu)",
+    g_variant_new ("(u@ayuu)",
+                   arg_iocode,
                    arg_pin,
                    arg_uin,
                    arg_uout),
@@ -601,7 +617,7 @@ com_dd_service_call_ioctl_finish (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(@s)",
+                 "(@ay)",
                  out_pout);
   g_variant_unref (_ret);
 _out:
@@ -611,6 +627,7 @@ _out:
 /**
  * com_dd_service_call_ioctl_sync:
  * @proxy: A #ComDdServiceProxy.
+ * @arg_iocode: Argument to pass with the method invocation.
  * @arg_pin: Argument to pass with the method invocation.
  * @arg_uin: Argument to pass with the method invocation.
  * @arg_uout: Argument to pass with the method invocation.
@@ -627,6 +644,7 @@ _out:
 gboolean
 com_dd_service_call_ioctl_sync (
     ComDdService *proxy,
+    guint arg_iocode,
     GVariant *arg_pin,
     guint arg_uin,
     guint arg_uout,
@@ -637,7 +655,8 @@ com_dd_service_call_ioctl_sync (
   GVariant *_ret;
   _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
     "ioctl",
-    g_variant_new ("(@suu)",
+    g_variant_new ("(u@ayuu)",
+                   arg_iocode,
                    arg_pin,
                    arg_uin,
                    arg_uout),
@@ -648,7 +667,7 @@ com_dd_service_call_ioctl_sync (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(@s)",
+                 "(@ay)",
                  out_pout);
   g_variant_unref (_ret);
 _out:
@@ -776,7 +795,7 @@ com_dd_service_complete_ioctl (
     GVariant *pout)
 {
   g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("(@s)",
+    g_variant_new ("(@ay)",
                    pout));
 }
 
@@ -1367,7 +1386,7 @@ _com_dd_service_on_signal_notification (
   GVariant   *signal_variant;
   connections = g_dbus_interface_skeleton_get_connections (G_DBUS_INTERFACE_SKELETON (skeleton));
 
-  signal_variant = g_variant_ref_sink (g_variant_new ("(@s)",
+  signal_variant = g_variant_ref_sink (g_variant_new ("(@ay)",
                    arg_data));
   for (l = connections; l != NULL; l = l->next)
     {

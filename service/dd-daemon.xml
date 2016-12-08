@@ -12,9 +12,10 @@
 <node name="/service">
 	<interface name="com.dd.service">
 		<method name="ioctl">
-			<arg name="pin" type="s" direction="in"/>
+			<arg name="iocode" type="u" direction="in"/>
+			<arg name="pin" type="ay" direction="in"/>
 			<arg name="uin" type="u" direction="in"/>
-			<arg name="pout" type="s" direction="out"/>
+			<arg name="pout" type="ay" direction="out"/>
 			<arg name="uout" type="u" direction="in"/>
 		</method>
 		<method name="test">
@@ -22,7 +23,7 @@
 			<arg name="pout" type="i" direction="out"/>
 		</method>
 		<signal name="notification">
-			<arg name="data" type="s"/>
+			<arg name="data" type="ay"/>
 		</signal>
 		<signal name="test">
 			<arg name="data" type="i"/>

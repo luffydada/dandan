@@ -10,11 +10,10 @@
 ******************************************************************************/
 #include "dandan.h"
 
-class ddServerTest : public ddApp , public ddTimer::interface {
+class ddServerTest : public ddApp, public ddTimer::interface {
 public:
-	ddServerTest() : timer1(this), timer2(this) {
+	ddServerTest() : timer1(this) {
 		timer1.setTimer(1000);
-		timer2.setTimer(1000, yes);
 	}
 
 	~ddServerTest() {
@@ -27,17 +26,15 @@ public:
 	virtual ddUInt onTimer(ddUInt uTimerId) {
 		if ( timer1.isMe(uTimerId) ) {
 			printf("ddServerTest,onTimer,time1\n");
-		} else if ( timer2.isMe(uTimerId) ) {
-			printf("ddServerTest,onTimer,time2\n");
 		}
 		return 0;
 	}
 
 private:
 	ddTimer timer1;
-	ddTimer timer2;
 };
 
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[])
 {
 	ddServerTest::startup("client", yes);

@@ -10,22 +10,32 @@
 ******************************************************************************/
 #include "dandan.h"
 
-class ddClientTest: public ddApp {
+class ddClientTest: public ddApp, public ddTimer::interface {
 public:
-	ddClientTest()
-	{
+	ddClientTest() : m_testTimer(this) {
+		m_testTimer.setTimer(3000);
 	}
 
-	~ddClientTest()
-	{
+	~ddClientTest() {
 	}
 
-	virtual ddVoid onInitApp()
-	{
+	virtual ddVoid onInitApp() {
 		printf("ddClientTest,onInitApp\n");
 	}
+	virtual ddUInt onTimer(ddUInt uTimerId) {
+		if ( m_testTimer.isMe(uTimerId) ) {
+			ddUInt8 data = 88;
+//			ddService::ioctl(1, &data, sizeof(ddUInt8));
+			ddService::ioctl(1, &data, sizeof(ddUInt8), &data, sizeof(ddUInt8));
+		}
+		return 0;
+	}
+
+private:
+	ddTimer m_testTimer;
 };
 
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[])
 {
 	ddClientTest client;

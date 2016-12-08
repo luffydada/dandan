@@ -59,6 +59,7 @@ private:
 	ddBool m_isLoop;
 };
 
+///////////////////////////////////////////////////////////////////////////////
 ddTimer::ddTimer(interface *pOwner/* = nil*/)
 {
 	DD_D_NEW(ddTimerPrivate);

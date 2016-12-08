@@ -71,6 +71,8 @@ typedef const ddDouble *		ddpCDouble;
 #define nil				(0L)
 #define yes				(1)
 #define no				(0)
+#define DD_MAXPATH		(256)
+#define DD_MAXDATA		(256)
 
 /* --------------------------------------------------------------------------*/
 /**

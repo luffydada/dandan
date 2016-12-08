@@ -24,6 +24,9 @@
 
 #include "type/dd_type.h"
 
+#include "service/dd_command.h"
+#include "service/dd_device.h"
+#include "service/dd_devmanager.h"
 #include "service/dd_service.h"
 
 #include "kernel/dd_timer.h"

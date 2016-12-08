@@ -47,7 +47,7 @@ public:
 
 	static ddVoid onGBusAcquiredCallback(GDBusConnection *connection, const gchar *name, gpointer user_data) {
 		ddServicePrivate * pthis = (ddServicePrivate *)user_data;
-		g_print("ddService,onGBusAcquiredCallback,name:%s,isServer:%d\n", name, pthis->m_isServer);
+		g_print("ddService,onGBusAcquiredCallback entry,name:%s,isServer:%d\n", name, pthis->m_isServer);
 		if ( pthis->m_isServer ) {
 			/** Second step: Try to get a connection to the given bus. */
 			pthis->m_pService = com_dd_service_skeleton_new();
@@ -66,6 +66,7 @@ public:
 			if ( error ) {
 				g_print("ddService,onGBusAcquiredCallback,g_dbus_interface_skeleton_export,error:%s\n", error->message);
 				g_error_free(error);
+				error = nil;
 			}
 		} else {
 			/** Second step: try to get a connection to the given bus.*/
@@ -75,8 +76,10 @@ public:
 			if ( pProxyError ) {
 				g_print("ddService,onGBusAcquiredCallback,failed to create proxy,error:%s\n", pProxyError->message);
 				g_error_free(pProxyError);
+				pProxyError = nil;
 			}
 			if ( !pthis->m_pService ){
+				g_print("new proxy failed,error:%s\n", strerror(errno));
 				return;
 			}
 
@@ -103,6 +106,7 @@ public:
 		if ( pError ) {
 			g_print("ddService,onCallIoctlCallback,com_dd_service_call_ioctl_finish,error:%s\n", pError->message);
 			g_error_free(pError);
+			pError = nil;
 		}
 	}
 
@@ -114,13 +118,20 @@ public:
 		if ( pError ) {
 			g_print("ddService,onCallTestCallback,com_dd_service_call_test_finish,error:%s\n", pError->message);
 			g_error_free(pError);
+			pError = nil;
 		}
 	}
 
 	static gboolean on_handle_ioctl(ComDdService *object, GDBusMethodInvocation *invocation, 
-			GVariant *arg_pin, guint arg_uin, guint arg_uout) {
-		g_print("ddService,on_handle_ioctl,arg_uin:%d,arg_uout:%d\n", arg_uin, arg_uout);
-		GVariant *out_pout = nil;
+			guint arg_iocode, GVariant *arg_pin, guint arg_uin, guint arg_uout) {
+		printf("on_handle_ioctl,iocode:%d,uin:%d,uout:%d\n", arg_iocode, arg_uin, arg_uout);
+		gsize uin = 0;
+		const guchar *pin = (const guchar *)g_variant_get_fixed_array(arg_pin, &uin, sizeof(guchar));
+		ddByte pout[DD_MAXPATH] = {0};
+		memset(pout, 0, DD_MAXPATH);
+		DD_GLOBAL_INSTANCE_DO(ddDevManager, ioctl(arg_iocode, pin, uin, pout, arg_uout));
+//		arg_uout = !arg_uout ? 4 : arg_uout;
+		GVariant *out_pout = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, pout, arg_uout, sizeof(ddByte));
 		com_dd_service_complete_ioctl(object, invocation, out_pout);
 		return yes;
 	} 
@@ -155,7 +166,7 @@ public:
 		}
 	}
 
-	ddVoid startup(ddpCChar pName, ddBool isServer) {
+	ddBool startup(ddpCChar pName, ddBool isServer) {
 		m_isServer = isServer;
 		m_strName = pName;
 		m_busWatchId = g_bus_watch_name (G_BUS_TYPE_SESSION, busName(),
@@ -163,7 +174,7 @@ public:
                   onGBusNameAppearedCallback,
                   onGBusNameVanishedCallback,
                   this, nil);
-
+		return m_busWatchId > 0;
 	}
 
 	ddVoid startupSelf() {
@@ -177,16 +188,19 @@ public:
 			this, nil);
 	}
 
-	ddVoid ioctl(ddpCByte pIn, ddUInt16 uIn, ddpByte pOut, ddUInt16 uOut) {
+	ddVoid ioctl(ddUInt32 iocode, ddCPointer pIn, ddUInt16 uIn, ddPointer pOut, ddUInt16 uOut) {
 		GVariant *arg_pin = g_variant_new_fixed_array (G_VARIANT_TYPE_BYTE, pIn, uIn, sizeof(ddByte));
 		if ( arg_pin ) {
+			uIn = uIn > DD_MAXPATH ? DD_MAXPATH : uIn;
 			if ( pOut && uOut ) {
+				uOut = uOut > DD_MAXPATH ? DD_MAXPATH : uOut;
 				GError *pError = nil;
 				GVariant *out_pout = nil;
-				com_dd_service_call_ioctl_sync(m_pService, arg_pin, uIn, uOut, &out_pout, nil, &pError);
+				com_dd_service_call_ioctl_sync(m_pService, iocode, arg_pin, uIn, uOut, &out_pout, nil, &pError);
 				if ( pError ) {
 					g_print("ddService,ioctl,com_dd_service_call_ioctl_sync,error:%s\n", pError->message);
 					g_error_free(pError);
+					pError = nil;
 				}
 				if ( out_pout ) {
 					gsize n_elements = 0;
@@ -196,7 +210,7 @@ public:
 					}
 				}
 			} else {
-				com_dd_service_call_ioctl(m_pService, arg_pin, uIn, 0, nil, onCallIoctlCallback, this);
+				com_dd_service_call_ioctl(m_pService, iocode, arg_pin, uIn, 0, nil, onCallIoctlCallback, this);
 			}
 		}
 	}
@@ -216,6 +230,7 @@ private:
 	std::string m_strName;
 };
 
+///////////////////////////////////////////////////////////////////////////////
 ddService::ddService()
 {
 	DD_D_NEW(ddServicePrivate);
@@ -267,6 +282,7 @@ ddVoid ddService::startup(ddpCChar pName, ddBool isServer/* = no*/)
 	if ( pConnError ) {
 		g_print("ddService,startup,failed to connect to dbus,error:%s\n", pConnError->message);
 		g_error_free(pConnError);
+		pConnError = NULL;
 	}
 	if ( !pConnection ) {
 		gchar name[50] = "DBUS_SESSION_BUS_ADDRESS";
@@ -287,6 +303,7 @@ ddVoid ddService::startup(ddpCChar pName, ddBool isServer/* = no*/)
 		if ( pConnError ) {
 			g_print("ddService,startup,failed to connect to dbus again,error:%s\n", pConnError->message);
 			g_error_free(pConnError);
+			pConnError = NULL;
 		}
 	}
 	if ( pConnection ) {
@@ -294,14 +311,22 @@ ddVoid ddService::startup(ddpCChar pName, ddBool isServer/* = no*/)
 	   	pConnection = nil;
 	}
 	if ( pName ) {
-		DD_GLOBAL_INSTANCE_DO(ddService, dPtr()->startup(pName, isServer));
+		if ( ddServicePrivate *pInstance = ddGlobalInstance<ddServicePrivate>::instance() ) {
+			ddBool isOk = pInstance->startup(pName, isServer);
+			if ( isOk ) {
+				if ( isServer ) {
+					ddGlobalInstance<ddDevManager>::instance();
+				} else {
+				}
+			}
+		}
 	}
 }
 
-ddVoid ddService::ioctl(ddpCByte pIn, ddUInt16 uIn, ddpByte pOut/* = nil*/, ddUInt16 uOut/* = 0*/)
+ddVoid ddService::ioctl(ddUInt32 iocode, ddCPointer pIn, ddUInt16 uIn, ddPointer pOut/* = nil*/, ddUInt16 uOut/* = 0*/)
 {
 	if ( pIn && uIn ) {
-		DD_GLOBAL_INSTANCE_DO(ddService, dPtr()->ioctl(pIn, uIn, pOut, uOut));
+		DD_GLOBAL_INSTANCE_DO(ddServicePrivate, ioctl(iocode, pIn, uIn, pOut, uOut));
 	}
 }
 
