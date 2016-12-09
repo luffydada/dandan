@@ -32,7 +32,7 @@ struct _ComDdServiceIface
   gboolean (*handle_ioctl) (
     ComDdService *object,
     GDBusMethodInvocation *invocation,
-    guint arg_iocode,
+    guint arg_iocmd,
     GVariant *arg_pin,
     guint arg_uin,
     guint arg_uout);
@@ -85,7 +85,7 @@ void com_dd_service_emit_test (
 /* D-Bus method calls: */
 void com_dd_service_call_ioctl (
     ComDdService *proxy,
-    guint arg_iocode,
+    guint arg_iocmd,
     GVariant *arg_pin,
     guint arg_uin,
     guint arg_uout,
@@ -101,7 +101,7 @@ gboolean com_dd_service_call_ioctl_finish (
 
 gboolean com_dd_service_call_ioctl_sync (
     ComDdService *proxy,
-    guint arg_iocode,
+    guint arg_iocmd,
     GVariant *arg_pin,
     guint arg_uin,
     guint arg_uout,

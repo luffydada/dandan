@@ -163,11 +163,11 @@ _g_value_equal (const GValue *a, const GValue *b)
 
 /* ---- Introspection data for com.dd.service ---- */
 
-static const _ExtendedGDBusArgInfo _com_dd_service_method_info_ioctl_IN_ARG_iocode =
+static const _ExtendedGDBusArgInfo _com_dd_service_method_info_ioctl_IN_ARG_iocmd =
 {
   {
     -1,
-    (gchar *) "iocode",
+    (gchar *) "iocmd",
     (gchar *) "u",
     NULL
   },
@@ -209,7 +209,7 @@ static const _ExtendedGDBusArgInfo _com_dd_service_method_info_ioctl_IN_ARG_uout
 
 static const _ExtendedGDBusArgInfo * const _com_dd_service_method_info_ioctl_IN_ARG_pointers[] =
 {
-  &_com_dd_service_method_info_ioctl_IN_ARG_iocode,
+  &_com_dd_service_method_info_ioctl_IN_ARG_iocmd,
   &_com_dd_service_method_info_ioctl_IN_ARG_pin,
   &_com_dd_service_method_info_ioctl_IN_ARG_uin,
   &_com_dd_service_method_info_ioctl_IN_ARG_uout,
@@ -436,7 +436,7 @@ com_dd_service_default_init (ComDdServiceIface *iface)
    * ComDdService::handle-ioctl:
    * @object: A #ComDdService.
    * @invocation: A #GDBusMethodInvocation.
-   * @arg_iocode: Argument passed by remote caller.
+   * @arg_iocmd: Argument passed by remote caller.
    * @arg_pin: Argument passed by remote caller.
    * @arg_uin: Argument passed by remote caller.
    * @arg_uout: Argument passed by remote caller.
@@ -555,7 +555,7 @@ com_dd_service_emit_test (
 /**
  * com_dd_service_call_ioctl:
  * @proxy: A #ComDdServiceProxy.
- * @arg_iocode: Argument to pass with the method invocation.
+ * @arg_iocmd: Argument to pass with the method invocation.
  * @arg_pin: Argument to pass with the method invocation.
  * @arg_uin: Argument to pass with the method invocation.
  * @arg_uout: Argument to pass with the method invocation.
@@ -572,7 +572,7 @@ com_dd_service_emit_test (
 void
 com_dd_service_call_ioctl (
     ComDdService *proxy,
-    guint arg_iocode,
+    guint arg_iocmd,
     GVariant *arg_pin,
     guint arg_uin,
     guint arg_uout,
@@ -583,7 +583,7 @@ com_dd_service_call_ioctl (
   g_dbus_proxy_call (G_DBUS_PROXY (proxy),
     "ioctl",
     g_variant_new ("(u@ayuu)",
-                   arg_iocode,
+                   arg_iocmd,
                    arg_pin,
                    arg_uin,
                    arg_uout),
@@ -627,7 +627,7 @@ _out:
 /**
  * com_dd_service_call_ioctl_sync:
  * @proxy: A #ComDdServiceProxy.
- * @arg_iocode: Argument to pass with the method invocation.
+ * @arg_iocmd: Argument to pass with the method invocation.
  * @arg_pin: Argument to pass with the method invocation.
  * @arg_uin: Argument to pass with the method invocation.
  * @arg_uout: Argument to pass with the method invocation.
@@ -644,7 +644,7 @@ _out:
 gboolean
 com_dd_service_call_ioctl_sync (
     ComDdService *proxy,
-    guint arg_iocode,
+    guint arg_iocmd,
     GVariant *arg_pin,
     guint arg_uin,
     guint arg_uout,
@@ -656,7 +656,7 @@ com_dd_service_call_ioctl_sync (
   _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
     "ioctl",
     g_variant_new ("(u@ayuu)",
-                   arg_iocode,
+                   arg_iocmd,
                    arg_pin,
                    arg_uin,
                    arg_uout),

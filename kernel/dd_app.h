@@ -10,15 +10,26 @@
 #define dd_app_h
 
 class ddAppPrivate;
-class ddApp {
+class ddApp : public ddCommand::interface {
 	DD_PRIVATE_DECLARE(ddApp)
 public:
+/*	class interface : public ddCommand::interface {
+	public:
+		virtual ~interface();
+		virtual ddVoid onProtocol(ddCommand &cmd) = 0;
+	};*/
 	ddApp();
-	~ddApp();
+	virtual ~ddApp();
+
+	/* 实现ddCommand::interface的接口 */
+	ddVoid onDownload(ddpCByte data, ddUInt16 len);
+
+	/* 自定义函数 */
 	virtual ddVoid onInitApp();
 	static ddVoid startup(ddpCChar pName, ddBool isServer = no);
 	ddInt run();
 	ddVoid quit();
+
 };
 
 #endif // dd_app_h

@@ -123,13 +123,13 @@ public:
 	}
 
 	static gboolean on_handle_ioctl(ComDdService *object, GDBusMethodInvocation *invocation, 
-			guint arg_iocode, GVariant *arg_pin, guint arg_uin, guint arg_uout) {
-		printf("on_handle_ioctl,iocode:%d,uin:%d,uout:%d\n", arg_iocode, arg_uin, arg_uout);
+			guint arg_iocmd, GVariant *arg_pin, guint arg_uin, guint arg_uout) {
+		printf("on_handle_ioctl,iocmd:%d,uin:%d,uout:%d\n", arg_iocmd, arg_uin, arg_uout);
 		gsize uin = 0;
 		const guchar *pin = (const guchar *)g_variant_get_fixed_array(arg_pin, &uin, sizeof(guchar));
 		ddByte pout[DD_MAXPATH] = {0};
 		memset(pout, 0, DD_MAXPATH);
-		DD_GLOBAL_INSTANCE_DO(ddDevManager, ioctl(arg_iocode, pin, uin, pout, arg_uout));
+		DD_GLOBAL_INSTANCE_DO(ddDevManager, ioctl(arg_iocmd, pin, uin, pout, arg_uout));
 //		arg_uout = !arg_uout ? 4 : arg_uout;
 		GVariant *out_pout = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, pout, arg_uout, sizeof(ddByte));
 		com_dd_service_complete_ioctl(object, invocation, out_pout);
@@ -145,6 +145,9 @@ public:
 
 	static ddVoid on_notification(ComDdService *object, GVariant *arg_data) {
 		g_print("ddService,on_notification\n");
+		gsize uin = 0;
+		const guchar *pin = (const guchar *)g_variant_get_fixed_array(arg_data, &uin, sizeof(guchar));
+		DD_GLOBAL_INSTANCE_DO(ddSrvManager, notify(pin, uin));
 	}
 
 	static ddVoid on_test(ComDdService *object, gint arg_data) {
@@ -188,15 +191,15 @@ public:
 			this, nil);
 	}
 
-	ddVoid ioctl(ddUInt32 iocode, ddCPointer pIn, ddUInt16 uIn, ddPointer pOut, ddUInt16 uOut) {
+	ddVoid ioctl(ddUInt16 iocmd, ddCPointer pIn, ddUInt16 uIn, ddPointer pOut, ddUInt16 uOut) {
+		uIn = uIn > DD_MAXPATH ? DD_MAXPATH : uIn;
 		GVariant *arg_pin = g_variant_new_fixed_array (G_VARIANT_TYPE_BYTE, pIn, uIn, sizeof(ddByte));
 		if ( arg_pin ) {
-			uIn = uIn > DD_MAXPATH ? DD_MAXPATH : uIn;
 			if ( pOut && uOut ) {
 				uOut = uOut > DD_MAXPATH ? DD_MAXPATH : uOut;
 				GError *pError = nil;
 				GVariant *out_pout = nil;
-				com_dd_service_call_ioctl_sync(m_pService, iocode, arg_pin, uIn, uOut, &out_pout, nil, &pError);
+				com_dd_service_call_ioctl_sync(m_pService, iocmd, arg_pin, uIn, uOut, &out_pout, nil, &pError);
 				if ( pError ) {
 					g_print("ddService,ioctl,com_dd_service_call_ioctl_sync,error:%s\n", pError->message);
 					g_error_free(pError);
@@ -210,8 +213,16 @@ public:
 					}
 				}
 			} else {
-				com_dd_service_call_ioctl(m_pService, iocode, arg_pin, uIn, 0, nil, onCallIoctlCallback, this);
+				com_dd_service_call_ioctl(m_pService, iocmd, arg_pin, uIn, 0, nil, onCallIoctlCallback, this);
 			}
+		}
+	}
+
+	ddVoid notify(ddCPointer pIn, ddUInt16 uIn) {
+		uIn = uIn > DD_MAXPATH ? DD_MAXPATH : uIn;
+		GVariant *arg_pin = g_variant_new_fixed_array (G_VARIANT_TYPE_BYTE, pIn, uIn, sizeof(ddByte));
+		if ( arg_pin ) {
+			com_dd_service_emit_notification(m_pService, arg_pin);
 		}
 	}
 
@@ -317,16 +328,31 @@ ddVoid ddService::startup(ddpCChar pName, ddBool isServer/* = no*/)
 				if ( isServer ) {
 					ddGlobalInstance<ddDevManager>::instance();
 				} else {
+					ddGlobalInstance<ddSrvManager>::instance();
 				}
 			}
 		}
 	}
 }
 
-ddVoid ddService::ioctl(ddUInt32 iocode, ddCPointer pIn, ddUInt16 uIn, ddPointer pOut/* = nil*/, ddUInt16 uOut/* = 0*/)
+ddVoid ddService::ioctl(ddUInt16 iocmd, ddCPointer pIn, ddUInt16 uIn, ddPointer pOut/* = nil*/, ddUInt16 uOut/* = 0*/)
 {
 	if ( pIn && uIn ) {
-		DD_GLOBAL_INSTANCE_DO(ddServicePrivate, ioctl(iocode, pIn, uIn, pOut, uOut));
+		DD_GLOBAL_INSTANCE_DO(ddServicePrivate, ioctl(iocmd, pIn, uIn, pOut, uOut));
+	}
+}
+
+ddVoid ddService::download(ddpCByte data, ddUInt16 len)
+{
+	if ( data && len ) {
+		DD_GLOBAL_INSTANCE_DO(ddServicePrivate, ioctl(DDDEF_IOCOMMAND_PROTOCOL, data, len, nil, 0));
+	}
+}
+
+ddVoid ddService::commit(ddpCByte data, ddUInt16 len)
+{
+	if ( data && len ) {
+		DD_GLOBAL_INSTANCE_DO(ddServicePrivate, notify(data, len));
 	}
 }
 

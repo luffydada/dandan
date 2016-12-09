@@ -22,17 +22,31 @@ emDeviceId ddDevice::deviceId()
 	return DDENUM_DEVICEID_START;
 }
 
-ddBool ddDevice::isMyCode(ddUInt32 iocode)
+ddBool ddDevice::isMyCommand(ddUInt16 iocmd)
 {
 	return no;
 }
 
-ddVoid ddDevice::onIoctl(ddUInt32 iocode, ddCPointer pin, ddUInt16 uin, ddPointer pout, ddUInt16 uout)
+ddVoid ddDevice::onIoctl(ddUInt16 iocmd, ddCPointer pin, ddUInt16 uin, ddPointer pout, ddUInt16 uout)
+{
+}
+
+ddVoid ddDevice::onProtocol(ddCommand& cmd)
 {
 }
 
 ddVoid ddDevice::onMessage(ddUInt32 msg, ddUInt32& wParam, ddUInt32& lParam)
 {
+}
+
+ddVoid ddDevice::onCommit(ddpCByte data, ddUInt16 len)
+{
+	ddService::commit(data, len);
+}
+
+ddVoid ddDevice::onDownload(ddpCByte data, ddUInt16 len)
+{
+	ddService::commit(data, len);
 }
 
 ddVoid ddDevice::send(ddUInt32 msg, ddUInt32& wParam, ddUInt32& lParam, emDeviceId deviceId)

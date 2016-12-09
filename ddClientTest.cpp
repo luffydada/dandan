@@ -9,8 +9,7 @@
 *                                                                             *
 ******************************************************************************/
 #include "dandan.h"
-
-class ddClientTest: public ddApp, public ddTimer::interface {
+class ddClientTest: public ddApp, public ddTimer::interface, public ddSrvManager::listener {
 public:
 	ddClientTest() : m_testTimer(this) {
 		m_testTimer.setTimer(3000);
@@ -24,11 +23,26 @@ public:
 	}
 	virtual ddUInt onTimer(ddUInt uTimerId) {
 		if ( m_testTimer.isMe(uTimerId) ) {
-			ddUInt8 data = 88;
-//			ddService::ioctl(1, &data, sizeof(ddUInt8));
-			ddService::ioctl(1, &data, sizeof(ddUInt8), &data, sizeof(ddUInt8));
+/*			ddUInt8 data = 88;
+			ddService::ioctl(DDDEF_IOCOMMAND_RADIO + 1, &data, sizeof(ddUInt8), &data, sizeof(ddUInt8));
+			printf("ddClientTest,ioctl,pout:%d\n", data);
+*/
+					ddUInt8 ok = 33;
+					ddCommand cmd(this, DDDEF_IOCOMMAND_BLUETOOTH, DDENUM_COMMAND_SERVICE, &ok, 1);
+					cmd.download();
 		}
 		return 0;
+	}
+		
+	virtual ddUInt16 myCommand() {
+		return DDDEF_IOCOMMAND_RADIO;
+	}
+
+	virtual ddVoid onProtocol(ddCommand& cmd) {
+		printf("ddClientTest,onProtocol,cmd:%d\n", cmd.command());
+		if ( DDDEF_IOCOMMAND_RADIO == cmd.command() ) {
+			printf("ddClientTest,onProtocol,data:%d\n", *cmd.data());
+		}
 	}
 
 private:

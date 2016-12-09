@@ -10,96 +10,90 @@
 ******************************************************************************/
 #include "../dandan.h"
 
-class ddCommandPrivate : public ddPrivateBase {
-	DD_PUBLIC_DECLARE(ddCommand)
-public:
-	ddCommandPrivate() : m_pOwner(nil), m_len(0) {
-		memset(m_data, 0, DD_MAXPATH);
-	}
+ddCommand::interface::~interface() {}
+ddVoid ddCommand::interface::onCommit(ddpCByte data, ddUInt16 len) {}
+ddVoid ddCommand::interface::onDownload(ddpCByte data, ddUInt16 len) {}
 
-	~ddCommandPrivate() {
-	}
-
-	ddVoid setOwner(ddCommand::interface *pOwner) {
-		m_pOwner = pOwner;
-	}
-
-	ddVoid setData(ddpCByte data, ddUInt16 len, ddUInt16 pos) {
-		if ( data && (pos + len) <= maxLength() ) {
-			memcpy(m_data + pos, data, len);
-			m_len = m_len < (pos + len) ? (pos + len) : m_len;
-		}
-	}
-
-	ddpCByte data() {
-		return m_data;
-	}
-
-	ddUInt16 length() {
-		return m_len;
-	}
-
-	ddUInt16 maxLength() {
-		return DD_MAXDATA;
-	}
-
-	ddVoid download() {
-		if ( m_pOwner ) {
-			m_pOwner->onDownload(m_data, m_len);
-		}
-	}
-
-	ddVoid commit() {
-		if ( m_pOwner ) {
-			m_pOwner->onCommit(m_data, m_len);
-		}
-	}
-
-private:
-	ddCommand::interface *m_pOwner;
-	ddByte m_data[DD_MAXDATA];
-	ddUInt16 m_len;
-};
-
-///////////////////////////////////////////////////////////////////////////////
-ddCommand::ddCommand(interface *pOwner)
+ddCommand::ddCommand(interface *pOwner, ddUInt16 cmd/* = 0*/, emCommandType type/* = DDENUM_COMMAND_SERVICE*/, ddpCByte data/* = nil*/, ddUInt16 len/* = 0*/)
 {
-	DD_D_NEW(ddCommandPrivate);
-	dPtr()->setOwner(pOwner);
+	m_pOwner = pOwner;
+	m_len = 0;
+	memset(m_data, 0, DD_MAXDATA);
+	setType(type);
+	setCommand(cmd);
+	setData(data, len);
+}
+
+ddCommand::ddCommand(ddpCByte data, ddUInt16 len)
+{
+	m_pOwner = nil;
+	m_len = 0;
+	memset(m_data, 0, DD_MAXDATA);
+	if ( data && len > 3 ) {
+		setType(emCommandType(*data));
+		setCommand(*(reinterpret_cast<const ddUInt16 *>(data + 1)));
+		setData(data + 3, len - 3);
+	}
 }
 
 ddCommand::~ddCommand()
 {
-	DD_D_DELETE();
+}
+
+ddVoid ddCommand::setCommand(ddUInt16 cmd)
+{
+	*(reinterpret_cast<ddUInt16 *>(m_data + 1)) = cmd;
+}
+
+ddUInt16 ddCommand::command()
+{
+	return *(reinterpret_cast<ddUInt16 *>(m_data + 1));
+}
+
+ddVoid ddCommand::setType(emCommandType type)
+{
+	m_data[0] = ddByte(type);
+}
+
+emCommandType ddCommand::type()
+{
+	return emCommandType(m_data[0]);
 }
 
 ddVoid ddCommand::setData(ddpCByte data, ddUInt16 len, ddUInt16 pos/* = 0*/)
 {
-	dPtr()->setData(data, len, pos);
+	if ( data && (pos + len) <= maxLength() ) {
+		memcpy(m_data + 3 + pos, data, len);
+		m_len = m_len < (pos + len) ? (pos + len) : m_len;
+	}
 }
 
 ddpCByte ddCommand::data()
 {
-	return dPtr()->data();
+	return m_data + 3;
 }
 
 ddUInt16 ddCommand::length()
 {
-	return dPtr()->length();
+	return m_len;
 }
 
 ddUInt16 ddCommand::maxLength()
 {
-	return dPtr()->maxLength();
+	return DD_MAXDATA - 3;
 }
 
 ddVoid ddCommand::download()
 {
-	dPtr()->download();
+	if ( m_pOwner ) {
+		m_pOwner->onDownload(m_data, m_len + 3);
+	}
 }
 
 ddVoid ddCommand::commit()
 {
-	dPtr()->commit();
+	if ( m_pOwner ) {
+		m_pOwner->onCommit(m_data, m_len + 3);
+	}
 }
 

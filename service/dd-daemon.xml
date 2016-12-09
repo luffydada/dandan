@@ -12,7 +12,7 @@
 <node name="/service">
 	<interface name="com.dd.service">
 		<method name="ioctl">
-			<arg name="iocode" type="u" direction="in"/>
+			<arg name="iocmd" type="u" direction="in"/>
 			<arg name="pin" type="ay" direction="in"/>
 			<arg name="uin" type="u" direction="in"/>
 			<arg name="pout" type="ay" direction="out"/>

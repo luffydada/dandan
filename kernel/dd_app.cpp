@@ -65,6 +65,11 @@ ddVoid ddApp::onInitApp()
 {
 }
 
+ddVoid ddApp::startup(ddpCChar pName, ddBool isServer/* = no*/)
+{
+	ddService::startup(pName, isServer);
+}
+
 ddInt ddApp::run()
 {
 	return dPtr()->run();
@@ -74,8 +79,9 @@ ddVoid ddApp::quit()
 {
 	dPtr()->quit();
 }
-ddVoid ddApp::startup(ddpCChar pName, ddBool isServer/* = no*/)
+
+ddVoid ddApp::onDownload(ddpCByte data, ddUInt16 len)
 {
-	ddService::startup(pName, isServer);
+	ddService::download(data, len);
 }
 
