@@ -31,6 +31,10 @@ public:
 		return iocmd > DDENUM_IOCOMMAND_RADIO_START && iocmd < DDENUM_IOCOMMAND_RADIO_END;
 	}
 
+	virtual ddBool isMyProtocol(ddUInt16 iocmd) {
+		return iocmd == DDDEF_IOCOMMAND_RADIO;
+	}
+
 	virtual ddVoid onIoctl(ddUInt16 iocmd, ddCPointer pin, ddUInt16 uin, ddPointer pout, ddUInt16 uout) {
 		printf("radio device,onIoctl,iocmd:%d\n", iocmd);
 		switch ( iocmd ) {
@@ -39,7 +43,7 @@ public:
 					printf("radio device,onIoctl,test,pin:%d\n", *(ddUInt8 *)pin);
 					*(ddUInt8 *)pout = *(ddUInt8 *)pin + 1;
 					ddUInt8 ok = 11;
-					ddCommand cmd(this, DDDEF_IOCOMMAND_RADIO, DDENUM_COMMAND_APP, &ok, 1);
+					ddCommand cmd(this, DDDEF_IOCOMMAND_RADIO + 1, DDENUM_COMMAND_APP, &ok, 1);
 					cmd.commit();
 				}
 				break;
@@ -75,6 +79,10 @@ public:
 
 	virtual emDeviceId deviceId() {
 		return DDENUM_DEVICEID_BLUETOOTH;
+	}
+
+	virtual ddBool isMyProtocol(ddUInt16 iocmd) {
+		return iocmd == DDDEF_IOCOMMAND_BLUETOOTH;
 	}
 
 	virtual ddBool isMyCommand(ddUInt16 iocmd) {

@@ -12,6 +12,14 @@
 class ddTimerPrivate : public ddPrivateBase {
 	DD_PUBLIC_DECLARE(ddTimer)
 public:
+	ddTimerPrivate() :m_pOwner(nil), m_id(0), m_timerId(0), m_isLoop(no) {
+		m_timerId = ddTimer::realTimerId();
+	}
+
+	~ddTimerPrivate() {
+		killTimer();
+	}
+
 	static gboolean onTimeoutCallback(gpointer user_data) {
 		ddTimerPrivate *pthis = (ddTimerPrivate *)user_data;
 		if ( !pthis->m_isLoop ) {
@@ -19,14 +27,6 @@ public:
 		}
 		pthis->onTimer();
 		return pthis->m_isLoop;
-	}
-
-	ddTimerPrivate() :m_pOwner(nil), m_timerId(0), m_isLoop(no) {
-		m_timerId = ddTimer::realTimerId();
-	}
-
-	~ddTimerPrivate() {
-		killTimer();
 	}
 
 	ddVoid setOwner(ddTimer::interface *pOwner) {

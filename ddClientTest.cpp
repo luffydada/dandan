@@ -9,7 +9,7 @@
 *                                                                             *
 ******************************************************************************/
 #include "dandan.h"
-class ddClientTest: public ddApp, public ddTimer::interface, public ddSrvManager::listener {
+class ddClientTest: public ddApp, public ddTimer::interface, public ddSrvManager::/*listener*/notifier {
 public:
 	ddClientTest() : m_testTimer(this) {
 		m_testTimer.setTimer(3000);
@@ -28,12 +28,20 @@ public:
 			printf("ddClientTest,ioctl,pout:%d\n", data);
 */
 					ddUInt8 ok = 33;
-					ddCommand cmd(this, DDDEF_IOCOMMAND_BLUETOOTH, DDENUM_COMMAND_SERVICE, &ok, 1);
+					ddCommand cmd(this, DDDEF_IOCOMMAND_RADIO, DDENUM_COMMAND_SERVICE, &ok, 1);
 					cmd.download();
 		}
 		return 0;
 	}
 		
+	virtual ddBool isMyCommand(ddUInt16 command) {
+		return command > DDDEF_IOCOMMAND_RADIO && command < DDDEF_IOCOMMAND_BLUETOOTH;
+	}
+
+	virtual ddVoid onProtocol(ddCommand& cmd) {
+		printf("ddClientTest,onProtocol,cmd:%d\n", cmd.command());
+	}
+/*
 	virtual ddUInt16 myCommand() {
 		return DDDEF_IOCOMMAND_RADIO;
 	}
@@ -44,7 +52,7 @@ public:
 			printf("ddClientTest,onProtocol,data:%d\n", *cmd.data());
 		}
 	}
-
+*/
 private:
 	ddTimer m_testTimer;
 };

@@ -13,6 +13,21 @@
 class ddServicePrivate : public ddPrivateBase {
 	DD_PUBLIC_DECLARE(ddService)
 public:
+	ddServicePrivate() :m_isServer(no), m_busWatchId(0), m_busOwnId(0), m_pService(nil) {
+	}
+
+	~ddServicePrivate() {
+		if ( m_busWatchId ) {
+			g_bus_unwatch_name(m_busWatchId);
+		}
+		if ( m_busOwnId ) {
+			g_bus_unown_name(m_busOwnId);
+		}
+		if ( m_pService ) {
+			g_object_unref(m_pService);
+		}
+	}
+
 /*	static ddVoid cb_OwnerNameChangedNotify(GObject *object, GParamSpec *pspec, gpointer userdata) {
 		g_print("ddService,cb_OwnerNameChangedNotify\n");
 
@@ -152,21 +167,6 @@ public:
 
 	static ddVoid on_test(ComDdService *object, gint arg_data) {
 		g_print("ddService,on_test,arg_data:%d\n", arg_data);
-	}
-
-	ddServicePrivate() :m_isServer(no), m_busWatchId(0), m_busOwnId(0), m_pService(nil) {
-	}
-
-	~ddServicePrivate() {
-		if ( m_busWatchId ) {
-			g_bus_unwatch_name(m_busWatchId);
-		}
-		if ( m_busOwnId ) {
-			g_bus_unown_name(m_busOwnId);
-		}
-		if ( m_pService ) {
-			g_object_unref(m_pService);
-		}
 	}
 
 	ddBool startup(ddpCChar pName, ddBool isServer) {

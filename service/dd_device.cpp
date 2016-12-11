@@ -27,6 +27,11 @@ ddBool ddDevice::isMyCommand(ddUInt16 iocmd)
 	return no;
 }
 
+ddBool ddDevice::isMyProtocol(ddUInt16 iocmd)
+{
+	return no;
+}
+
 ddVoid ddDevice::onIoctl(ddUInt16 iocmd, ddCPointer pin, ddUInt16 uin, ddPointer pout, ddUInt16 uout)
 {
 }

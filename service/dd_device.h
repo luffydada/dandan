@@ -30,6 +30,7 @@ public:
 	~ddDevice();
 	virtual emDeviceId deviceId();
 	virtual ddBool isMyCommand(ddUInt16 iocmd);
+	virtual ddBool isMyProtocol(ddUInt16 iocmd);
 	virtual ddVoid onIoctl(ddUInt16 iocmd, ddCPointer pin, ddUInt16 uin, ddPointer pout, ddUInt16 uout);
 	virtual ddVoid onMessage(ddUInt32 msg, ddUInt32& wParam, ddUInt32& lParam);
 	virtual ddVoid onProtocol(ddCommand& cmd);

@@ -48,10 +48,10 @@ public:
 			printf("devmanager,ioctl,cmd:%d,size:%d\n", cmd.command(), m_listDevice.size());
 			std::list<ddDevice *>::const_iterator it = m_listDevice.begin();
 			while ( it != m_listDevice.end() ) {
-//				if ( (*it)->isMyCommand(cmd.command()) ) {
+				if ( (*it)->isMyProtocol(cmd.command()) ) {
 					(*it)->onProtocol(cmd);
-//					break;
-//				}
+					break;
+				}
 				it++;
 			}
 			return;
