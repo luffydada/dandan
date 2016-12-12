@@ -24,12 +24,16 @@
 
 #include "type/dd_type.h"
 
+#include "utility/dd_log.h"
+#include "utility/dd_filemanager.h"
+
 #include "service/dd_command.h"
 #include "service/dd_device.h"
-#include "service/dd_devmanager.h"
+#include "service/dd_devsrvmanager.h"
 #include "service/dd_service.h"
 
-#include "kernel/dd_timer.h"
 #include "kernel/dd_app.h"
+#include "kernel/dd_process.h"
+#include "kernel/dd_timer.h"
 
 #endif //dandan.h

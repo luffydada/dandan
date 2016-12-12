@@ -1,11 +1,11 @@
 /******************************************************************************
 *    Copyright (C), 2015 by HappyTown                                         *
-*    FileName:    dd_devmanager.cpp
+*    FileName:    dd_devsrvmanager.cpp
 *    Author:      WangYing	                                             *
 *    Description:                                                             *
 *    History:                                                                 *
 *      <author>          <time>          <version>          <description>     *
-*        Xzj        2016-12-08 11:09      V1.0.0                build         *
+*        Xzj        2016-12-12 19:39      V1.0.0                build         *
 *                                                                             *
 ******************************************************************************/
 #include "../dandan.h"
@@ -45,7 +45,6 @@ public:
 	ddVoid ioctl(ddUInt16 iocmd, ddCPointer pin, ddUInt16 uin, ddPointer pout, ddUInt16 uout) {
 		if ( DDDEF_IOCOMMAND_PROTOCOL == iocmd ) {
 			ddCommand cmd(reinterpret_cast<ddpCByte>(pin), uin);
-			printf("devmanager,ioctl,cmd:%d,size:%d\n", cmd.command(), m_listDevice.size());
 			std::list<ddDevice *>::const_iterator it = m_listDevice.begin();
 			while ( it != m_listDevice.end() ) {
 				if ( (*it)->isMyProtocol(cmd.command()) ) {
@@ -111,7 +110,6 @@ ddVoid ddDevManager::remove(ddDevice *pDevice)
 
 ddVoid ddDevManager::ioctl(ddUInt16 iocmd, ddCPointer pin, ddUInt16 uin, ddPointer pout, ddUInt16 uout)
 {
-	printf("ddDevManager,ioctl,iocmd:%d,uin:%d,uout:%d\n", iocmd, uin, uout);
 	dPtr()->ioctl(iocmd, pin, uin, pout, uout);
 }
 

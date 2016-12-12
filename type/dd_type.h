@@ -102,8 +102,8 @@ class ddGlobalInstance {
 public:
 	ddGlobalInstance() {}
 	~ddGlobalInstance() { release(); }
-	static T *instance() {
-		if ( !s_pInstance ) {
+	static T *instance(ddBool isOnlyGet = no) {
+		if ( !isOnlyGet && !s_pInstance ) {
 			s_pInstance = new T();
 		}
 		return s_pInstance;

@@ -1,15 +1,15 @@
 /******************************************************************************
 *    Copyright (C), 2015 by HappyTown                                         *
-*    FileName:    dd_devmanager.h
+*    FileName:    dd_devsrvmanager.h
 *    Author:      WangYing	                                             *
 *    Description:                                                             *
 *    History:                                                                 *
 *      <author>          <time>          <version>          <description>     *
-*        Xzj        2016-12-08 11:08      V1.0.0                build         *
+*        Xzj        2016-12-12 19:39      V1.0.0                build         *
 *                                                                             *
 ******************************************************************************/
-#ifndef dd_devmanager_h
-#define dd_devmanager_h
+#ifndef dd_devsrvmanager_h
+#define dd_devsrvmanager_h
 
 class ddDevManagerPrivate;
 class ddDevManager {
@@ -52,5 +52,5 @@ public:
 	ddVoid remove(notifier *pNotifier);
 	ddVoid notify(ddpCByte data, ddUInt16 len);
 };
-#endif // dd_devmanager_h
 
+#endif // dd_devsrvmanager_h

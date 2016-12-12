@@ -19,13 +19,13 @@ public:
 	}
 
 	virtual ddVoid onInitApp() {
-		printf("ddClientTest,onInitApp\n");
+		dd_log_d2("ddClientTest,onInitApp\n");
 	}
 	virtual ddUInt onTimer(ddUInt uTimerId) {
 		if ( m_testTimer.isMe(uTimerId) ) {
 /*			ddUInt8 data = 88;
 			ddService::ioctl(DDDEF_IOCOMMAND_RADIO + 1, &data, sizeof(ddUInt8), &data, sizeof(ddUInt8));
-			printf("ddClientTest,ioctl,pout:%d\n", data);
+			dd_log_d("ddClientTest,ioctl,pout:%d\n", data);
 */
 					ddUInt8 ok = 33;
 					ddCommand cmd(this, DDDEF_IOCOMMAND_RADIO, DDENUM_COMMAND_SERVICE, &ok, 1);
@@ -39,7 +39,7 @@ public:
 	}
 
 	virtual ddVoid onProtocol(ddCommand& cmd) {
-		printf("ddClientTest,onProtocol,cmd:%d\n", cmd.command());
+		dd_log_d("ddClientTest,onProtocol,cmd:%d\n", cmd.command());
 	}
 /*
 	virtual ddUInt16 myCommand() {
@@ -47,9 +47,9 @@ public:
 	}
 
 	virtual ddVoid onProtocol(ddCommand& cmd) {
-		printf("ddClientTest,onProtocol,cmd:%d\n", cmd.command());
+		dd_log_d("ddClientTest,onProtocol,cmd:%d\n", cmd.command());
 		if ( DDDEF_IOCOMMAND_RADIO == cmd.command() ) {
-			printf("ddClientTest,onProtocol,data:%d\n", *cmd.data());
+			dd_log_d("ddClientTest,onProtocol,data:%d\n", *cmd.data());
 		}
 	}
 */

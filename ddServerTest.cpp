@@ -36,11 +36,11 @@ public:
 	}
 
 	virtual ddVoid onIoctl(ddUInt16 iocmd, ddCPointer pin, ddUInt16 uin, ddPointer pout, ddUInt16 uout) {
-		printf("radio device,onIoctl,iocmd:%d\n", iocmd);
+		dd_log_d("radio device,onIoctl,iocmd:%d\n", iocmd);
 		switch ( iocmd ) {
 			case DDENUM_IOCOMMAND_RADIO_TEST:
 				if ( pin && uin && pout && uout ) {
-					printf("radio device,onIoctl,test,pin:%d\n", *(ddUInt8 *)pin);
+					dd_log_d("radio device,onIoctl,test,pin:%d\n", *(ddUInt8 *)pin);
 					*(ddUInt8 *)pout = *(ddUInt8 *)pin + 1;
 					ddUInt8 ok = 11;
 					ddCommand cmd(this, DDDEF_IOCOMMAND_RADIO + 1, DDENUM_COMMAND_APP, &ok, 1);
@@ -56,7 +56,7 @@ public:
 
 	virtual ddVoid onProtocol(ddCommand& cmd) {
 		if ( DDDEF_IOCOMMAND_RADIO == cmd.command() ) {
-			printf("ddRadioDevice,onProtocol,data:%d\n", *cmd.data());
+			dd_log_d("ddRadioDevice,onProtocol,data:%d\n", *cmd.data());
 			ddUInt8 ok = 22;
 			ddCommand cmd2(this, DDDEF_IOCOMMAND_RADIO, DDENUM_COMMAND_SERVICE, &ok, 1);
 			cmd2.download();
@@ -90,7 +90,7 @@ public:
 	}
 
 	virtual ddVoid onIoctl(ddUInt16 iocmd, ddCPointer pin, ddUInt16 uin, ddPointer pout, ddUInt16 uout) {
-		printf("bluetooth device,onIoctl\n");
+		dd_log_d2("bluetooth device,onIoctl\n");
 		switch ( iocmd ) {
 			case DDENUM_IOCOMMAND_BLUETOOTH_TEST:
 				break;
@@ -103,7 +103,7 @@ public:
 
 	virtual ddVoid onProtocol(ddCommand& cmd) {
 		if ( DDDEF_IOCOMMAND_BLUETOOTH == cmd.command() ) {
-			printf("ddBluetoothDevice,onProtocol,data:%d\n", *cmd.data());
+			dd_log_d("ddBluetoothDevice,onProtocol,data:%d\n", *cmd.data());
 		}
 	}
 };
@@ -118,14 +118,14 @@ public:
 	}
 
 	virtual ddVoid onInitApp() {
-		printf("ddServerTest,onInitApp\n");
+		dd_log_d2("ddServerTest,onInitApp\n");
 		DD_GLOBAL_INSTANCE_DO(ddDevManager, add(ddGlobalInstance<ddRadioDevice>::instance()));
 		DD_GLOBAL_INSTANCE_DO(ddDevManager, add(ddGlobalInstance<ddBluetoothDevice>::instance()));
 	}
 		
 	virtual ddUInt onTimer(ddUInt uTimerId) {
 		if ( timer1.isMe(uTimerId) ) {
-			printf("ddServerTest,onTimer,time1\n");
+			dd_log_d2("ddServerTest,onTimer,time1\n");
 		}
 		return 0;
 	}
