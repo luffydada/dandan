@@ -32,7 +32,7 @@ public:
 	class listener {
 	public:
 		listener();
-		virtual ~listener();
+		virtual ~listener() {}
 		virtual ddUInt16 myCommand() = 0;
 		virtual ddVoid onProtocol(ddCommand& cmd) = 0;
 	};
@@ -40,7 +40,7 @@ public:
 	class notifier {
 	public:
 		notifier();
-		virtual ~notifier();
+		virtual ~notifier() {}
 		virtual ddBool isMyCommand(ddUInt16 command) = 0;
 		virtual ddVoid onProtocol(ddCommand& cmd) = 0;
 	};

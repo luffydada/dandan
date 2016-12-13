@@ -215,14 +215,11 @@ ddSrvManager::listener::listener()
 	DD_GLOBAL_INSTANCE_DO(ddSrvManager, add(this));
 }
 
-ddSrvManager::listener::~listener() {}
 
 ddSrvManager::notifier::notifier()
 {
 	DD_GLOBAL_INSTANCE_DO(ddSrvManager, add(this));
 }
-
-ddSrvManager::notifier::~notifier() {}
 
 ddSrvManager::ddSrvManager()
 {

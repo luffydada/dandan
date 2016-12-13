@@ -9,9 +9,9 @@
 *                                                                             *
 ******************************************************************************/
 #include "dandan.h"
-class ddClientTest: public ddApp, public ddTimer::interface, public ddSrvManager::/*listener*/notifier {
+class ddClientTest: public ddApp, public ddTimer::interface, public ddSrvManager::/*listener*/notifier, ddThread::interface {
 public:
-	ddClientTest() : m_testTimer(this) {
+	ddClientTest() : m_testTimer(this), m_testThread1(this), m_testThread2(this) {
 		m_testTimer.setTimer(3000);
 	}
 
@@ -19,10 +19,12 @@ public:
 	}
 
 	virtual ddVoid onInitApp() {
-		dd_log_d2("ddClientTest,onInitApp\n");
+		dd_log_d("ddClientTest,onInitApp\n");
+		m_testThread1.start();
 	}
-	virtual ddUInt onTimer(ddUInt uTimerId) {
-		if ( m_testTimer.isMe(uTimerId) ) {
+
+	virtual ddVoid onTimer(ddTimer* pTimer) {
+		if ( pTimer == &m_testTimer ) {
 /*			ddUInt8 data = 88;
 			ddService::ioctl(DDDEF_IOCOMMAND_RADIO + 1, &data, sizeof(ddUInt8), &data, sizeof(ddUInt8));
 			dd_log_d("ddClientTest,ioctl,pout:%d\n", data);
@@ -30,8 +32,9 @@ public:
 					ddUInt8 ok = 33;
 					ddCommand cmd(this, DDDEF_IOCOMMAND_RADIO, DDENUM_COMMAND_SERVICE, &ok, 1);
 					cmd.download();
+			m_testThread1.start();
+			m_testThread2.start();
 		}
-		return 0;
 	}
 		
 	virtual ddBool isMyCommand(ddUInt16 command) {
@@ -53,8 +56,18 @@ public:
 		}
 	}
 */
+	virtual ddVoid onThread(ddThread* pThread) {
+		if ( &m_testThread1 == pThread ) {
+			dd_log_d("test thread1 run\n");
+		} else if ( &m_testThread2 == pThread ) {
+			dd_log_d("test thread2 run\n");
+		}
+	}
+
 private:
 	ddTimer m_testTimer;
+	ddThread m_testThread1;
+	ddThread m_testThread2;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

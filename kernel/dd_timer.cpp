@@ -12,8 +12,7 @@
 class ddTimerPrivate : public ddPrivateBase {
 	DD_PUBLIC_DECLARE(ddTimer)
 public:
-	ddTimerPrivate() :m_pOwner(nil), m_id(0), m_timerId(0), m_isLoop(no) {
-		m_timerId = ddTimer::realTimerId();
+	ddTimerPrivate() :m_pOwner(nil), m_id(0), m_isLoop(no) {
 	}
 
 	~ddTimerPrivate() {
@@ -48,14 +47,13 @@ public:
 
 	ddVoid onTimer() {
 		if ( m_pOwner ) {
-			m_pOwner->onTimer(m_timerId);
+			m_pOwner->onTimer(bPtr());
 		}
 	}
 
 private:
 	ddTimer::interface *m_pOwner;
 	guint m_id;
-	ddUInt m_timerId;
 	ddBool m_isLoop;
 };
 
@@ -71,20 +69,9 @@ ddTimer::~ddTimer()
 	DD_D_DELETE();
 }
 
-ddUInt ddTimer::realTimerId()
-{
-	static ddUInt id = 0;
-	return ++id;
-}
-
 ddVoid ddTimer::setOwner(interface *pOwner)
 {
 	dPtr()->setOwner(pOwner);
-}
-
-ddBool ddTimer::isMe(ddUInt uTimerId)
-{
-	return (uTimerId == dPtr()->m_timerId);
 }
 
 ddVoid ddTimer::setTimer(ddUInt uTimeout, ddBool isLoop/* = no*/)

@@ -37,11 +37,10 @@ public:
 		g_main_loop_quit(m_pMainLoop);
 	}
 
-	virtual ddUInt onTimer(ddUInt uTimerId) {
-		if ( m_timer.isMe(uTimerId) ) {
+	virtual ddVoid onTimer(ddTimer* pTimer) {
+		if ( pTimer == &m_timer ) {
 			bPtr()->onInitApp();
 		}
-		return 0;
 	}
 
 private:

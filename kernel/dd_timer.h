@@ -16,14 +16,12 @@ public:
 	class interface {
 	public:
 		virtual ~interface() {}
-		virtual ddUInt onTimer(ddUInt uTimerId) { return uTimerId; }
+		virtual ddVoid onTimer(ddTimer* pTimer) = 0;
 	};
 
 	ddTimer(interface *pOwner = nil);
 	virtual ~ddTimer();
-	static ddUInt realTimerId();
 	ddVoid setOwner(interface *pOwner);
-	ddBool isMe(ddUInt uTimerId);
 	ddVoid setTimer(ddUInt uTimeout, ddBool isLoop = no);
 	ddVoid killTimer();
 };

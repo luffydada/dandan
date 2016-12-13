@@ -90,7 +90,7 @@ public:
 	}
 
 	virtual ddVoid onIoctl(ddUInt16 iocmd, ddCPointer pin, ddUInt16 uin, ddPointer pout, ddUInt16 uout) {
-		dd_log_d2("bluetooth device,onIoctl\n");
+		dd_log_d("bluetooth device,onIoctl\n");
 		switch ( iocmd ) {
 			case DDENUM_IOCOMMAND_BLUETOOTH_TEST:
 				break;
@@ -110,7 +110,7 @@ public:
 
 class ddServerTest : public ddApp, public ddTimer::interface {
 public:
-	ddServerTest() : timer1(this) {
+	ddServerTest() : timer1(this), timer2(this) {
 		timer1.setTimer(1000);
 	}
 
@@ -118,20 +118,23 @@ public:
 	}
 
 	virtual ddVoid onInitApp() {
-		dd_log_d2("ddServerTest,onInitApp\n");
+		dd_log_d("ddServerTest,onInitApp\n");
 		DD_GLOBAL_INSTANCE_DO(ddDevManager, add(ddGlobalInstance<ddRadioDevice>::instance()));
 		DD_GLOBAL_INSTANCE_DO(ddDevManager, add(ddGlobalInstance<ddBluetoothDevice>::instance()));
+		timer2.setTimer(1000);
 	}
 		
-	virtual ddUInt onTimer(ddUInt uTimerId) {
-		if ( timer1.isMe(uTimerId) ) {
-			dd_log_d2("ddServerTest,onTimer,time1\n");
+	virtual ddVoid onTimer(ddTimer* pTimer) {
+		if ( pTimer == &timer1 ) {
+			dd_log_d("ddServerTest,onTimer,time1\n");
+		} else if ( pTimer == &timer2 ) {
+			dd_log_d("ddServerTest,onTimer,time2\n");
 		}
-		return 0;
 	}
 
 private:
 	ddTimer timer1;
+	ddTimer timer2;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

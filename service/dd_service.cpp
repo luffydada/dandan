@@ -29,22 +29,22 @@ public:
 	}
 
 /*	static ddVoid cb_OwnerNameChangedNotify(GObject *object, GParamSpec *pspec, gpointer userdata) {
-		g_print("ddService,cb_OwnerNameChangedNotify\n");
+		g_print("cb_OwnerNameChangedNotify\n");
 
 		gchar *pname_owner = g_dbus_proxy_get_name_owner((GDBusProxy*)object);
 		if ( pname_owner ){
-			g_print("ddService,DBus service is ready!\n");
+			g_print("DBus service is ready!\n");
 			g_free(pname_owner);
 		}
 		else{
-			g_print("ddService,DBus service is NOT ready!\n");
+			g_print("DBus service is NOT ready!\n");
 			g_free(pname_owner);
 		}
 	}*/
 
 	static ddVoid onGBusNameAppearedCallback(GDBusConnection *connection, const gchar *name, const gchar *name_owner, gpointer user_data) {
 		ddServicePrivate * pthis = (ddServicePrivate *)user_data;
-		dd_log_d("ddService,onGBusNameAppearedCallback,name:%s,name_owner:%s\n", name, name_owner);
+		dd_log_d("onGBusNameAppearedCallback,name:%s,name_owner:%s\n", name, name_owner);
 		if ( !pthis->m_isServer ) {
 			pthis->startupSelf();
 		}
@@ -52,7 +52,7 @@ public:
 
 	static ddVoid onGBusNameVanishedCallback(GDBusConnection *connection, const gchar *name, gpointer user_data) {
 		ddServicePrivate *pthis = (ddServicePrivate *)user_data;
-		dd_log_d("ddService,onGBusNameVanishedCallback,name:%s,isServer:%d\n", name, pthis->m_isServer);
+		dd_log_d("onGBusNameVanishedCallback,name:%s,isServer:%d\n", name, pthis->m_isServer);
 		if ( !pthis->m_isServer ) {
 			ddService::startupServer();
 		} else {
@@ -62,12 +62,12 @@ public:
 
 	static ddVoid onGBusAcquiredCallback(GDBusConnection *connection, const gchar *name, gpointer user_data) {
 		ddServicePrivate * pthis = (ddServicePrivate *)user_data;
-		dd_log_d("ddService,onGBusAcquiredCallback entry,name:%s,isServer:%d\n", name, pthis->m_isServer);
+		dd_log_d("onGBusAcquiredCallback entry,name:%s,isServer:%d\n", name, pthis->m_isServer);
 		if ( pthis->m_isServer ) {
 			/** Second step: Try to get a connection to the given bus. */
 			pthis->m_pService = com_dd_service_skeleton_new();
 			if ( !pthis->m_pService ) {
-				dd_log_e2("ddService,onGBusAcquiredCallback,new skeleton failed\n");
+				dd_log_e("onGBusAcquiredCallback,new skeleton failed,error:%s\n", strerror(errno));
 				return;
 			}
 
@@ -79,7 +79,7 @@ public:
 			GError *error = NULL;
 			g_dbus_interface_skeleton_export(G_DBUS_INTERFACE_SKELETON(pthis->m_pService), connection, pthis->objectPath(), &error);
 			if ( error ) {
-				dd_log_e("ddService,onGBusAcquiredCallback,g_dbus_interface_skeleton_export,error:%s\n", error->message);
+				dd_log_e("onGBusAcquiredCallback,g_dbus_interface_skeleton_export,error:%s\n", error->message);
 				g_error_free(error);
 				error = nil;
 			}
@@ -89,7 +89,7 @@ public:
 			pthis->m_pService = com_dd_service_proxy_new_sync(connection, G_DBUS_PROXY_FLAGS_NONE,
 					pthis->busName(), pthis->objectPath(), nil, &pProxyError);
 			if ( pProxyError ) {
-				dd_log_w("ddService,onGBusAcquiredCallback,failed to create proxy,error:%s\n", pProxyError->message);
+				dd_log_w("onGBusAcquiredCallback,failed to create proxy,error:%s\n", pProxyError->message);
 				g_error_free(pProxyError);
 				pProxyError = nil;
 			}
@@ -106,11 +106,11 @@ public:
 	}
 
 	static ddVoid onGBusNameAcquiredCallback(GDBusConnection *connection, const gchar *name, gpointer user_data) {
-		dd_log_d("ddService,onGBusNameAcquiredCallback,name:%s\n", name);
+		dd_log_d("onGBusNameAcquiredCallback,name:%s\n", name);
 	}
 
 	static ddVoid onGBusNameLostCallback(GDBusConnection *connection, const gchar *name, gpointer user_data) {
-		dd_log_d("ddService,onGBusNameLostCallback,name:%s\n", name);
+		dd_log_d("onGBusNameLostCallback,name:%s\n", name);
 	}
 
 	static ddVoid onCallIoctlCallback(GObject *source_object, GAsyncResult *res, gpointer user_data) {
@@ -119,7 +119,7 @@ public:
 		GError *pError = nil;
 		com_dd_service_call_ioctl_finish(pthis->m_pService, &out_pout, res, &pError);
 		if ( pError ) {
-			dd_log_w("ddService,onCallIoctlCallback,com_dd_service_call_ioctl_finish,error:%s\n", pError->message);
+			dd_log_w("onCallIoctlCallback,com_dd_service_call_ioctl_finish,error:%s\n", pError->message);
 			g_error_free(pError);
 			pError = nil;
 		}
@@ -131,7 +131,7 @@ public:
 		GError *pError = nil;
 		com_dd_service_call_test_finish(pthis->m_pService, pOut, res, &pError);
 		if ( pError ) {
-			dd_log_w("ddService,onCallTestCallback,com_dd_service_call_test_finish,error:%s\n", pError->message);
+			dd_log_w("onCallTestCallback,com_dd_service_call_test_finish,error:%s\n", pError->message);
 			g_error_free(pError);
 			pError = nil;
 		}
@@ -159,7 +159,7 @@ public:
 	}
 
 	static ddVoid on_notification(ComDdService *object, GVariant *arg_data) {
-		dd_log_d2("on_notification\n");
+		dd_log_d("on_notification\n");
 		gsize uin = 0;
 		const guchar *pin = (const guchar *)g_variant_get_fixed_array(arg_data, &uin, sizeof(guchar));
 		DD_GLOBAL_INSTANCE_DO(ddSrvManager, notify(pin, uin));
@@ -311,7 +311,7 @@ ddVoid ddService::startup(ddpCChar pName, ddBool isServer/* = no*/)
 		usleep(20* 1000);
 		pConnection = g_bus_get_sync(G_BUS_TYPE_SESSION, NULL, &pConnError);
 		if ( pConnError ) {
-			dd_log_w("ddService,startup,failed to connect to dbus again,error:%s\n", pConnError->message);
+			dd_log_w("startup,failed to connect to dbus again,error:%s\n", pConnError->message);
 			g_error_free(pConnError);
 			pConnError = NULL;
 		}
