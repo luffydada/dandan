@@ -33,6 +33,7 @@
 #include "service/dd_service.h"
 
 #include "kernel/dd_app.h"
+#include "kernel/dd_mediadevice.h"
 #include "kernel/dd_process.h"
 #include "kernel/dd_thread.h"
 #include "kernel/dd_timer.h"

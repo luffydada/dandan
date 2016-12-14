@@ -36,7 +36,7 @@ public:
 		m_pOwner = pOwner;
 	}
 
-	ddBool start() {
+	ddBool create() {
 		if ( m_pThread ) {
 			g_thread_join(m_pThread);
 		}
@@ -58,7 +58,6 @@ private:
 	ddThread::interface *m_pOwner;
 	GThread *m_pThread;
 };
-///////////////////////////////////////////////////////////////////////////////
 
 ddThread::ddThread(interface *pOwner)
 {
@@ -76,13 +75,122 @@ ddVoid ddThread::setOwner(interface *pOwner)
 	dPtr()->setOwner(pOwner);
 }
 
-ddBool ddThread::start()
+ddBool ddThread::create()
 {
-	return dPtr()->start();
+	return dPtr()->create();
 }
 
-ddVoid  ddThread::exit()
+ddVoid ddThread::exit()
 {
 	return dPtr()->exit();
+}
+
+ddVoid ddThread::sleep(ddUInt32 s)
+{
+	::sleep(s);
+}
+
+ddVoid ddThread::msleep(ddUInt32 ms)
+{
+	::usleep(ms * 1000);
+}
+
+ddVoid ddThread::usleep(ddUInt64 us)
+{
+	::usleep(us);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+class ddMutexPrivate : public ddPrivateBase {
+	DD_PUBLIC_DECLARE(ddMutex)
+public:
+	ddMutexPrivate() { g_mutex_init(&m_mutex); }
+	~ddMutexPrivate() { g_mutex_clear(&m_mutex); }
+	ddVoid lock() { g_mutex_lock(&m_mutex); }
+	ddVoid tryLock() { g_mutex_trylock(&m_mutex); }
+	ddVoid unlock() { g_mutex_unlock(&m_mutex); }
+	GMutex* mutex() { return &m_mutex; }
+private: GMutex m_mutex;
+};
+
+ddMutex::ddMutex()
+{
+	DD_D_NEW(ddMutexPrivate);
+}
+
+ddMutex::~ddMutex()
+{
+	DD_D_DELETE();
+}
+
+ddVoid ddMutex::lock()
+{
+	dPtr()->lock();
+}
+
+ddVoid ddMutex::tryLock()
+{
+	dPtr()->tryLock();
+}
+
+ddVoid ddMutex::unlock()
+{
+	dPtr()->unlock();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+class ddCondPrivate : public ddPrivateBase {
+	DD_PUBLIC_DECLARE(ddCond)
+public:
+	friend ddMutexPrivate;
+	ddCondPrivate() { g_cond_init(&m_cond); }
+	~ddCondPrivate() { g_cond_clear(&m_cond); }
+	ddVoid signal() { g_cond_signal(&m_cond); }
+	ddVoid broadcast() { g_cond_broadcast(&m_cond); }
+	ddVoid wait(ddMutex* pMutex) { 
+		if ( pMutex ) {
+			g_cond_wait(&m_cond, pMutex->dPtr()->mutex());
+		}
+	}
+
+	ddBool waitUntil(ddMutex *pMutex, ddUInt32 ms) {
+		ddBool ret = no;
+		if ( pMutex ) {
+			ret = g_cond_wait_until(&m_cond, pMutex->dPtr()->mutex(), g_get_monotonic_time() + 1000 * ms);
+		}
+		return ret;
+	}
+private:
+	GCond m_cond;
+};
+
+ddCond::ddCond()
+{
+	DD_D_NEW(ddCondPrivate);
+}
+
+ddCond::~ddCond()
+{
+	DD_D_DELETE();
+}
+
+ddVoid ddCond::signal()
+{
+	dPtr()->signal();
+}
+
+ddVoid ddCond::broadcast()
+{
+	dPtr()->broadcast();
+}
+
+ddVoid ddCond::wait(ddMutex* pMutex)
+{
+	dPtr()->wait(pMutex);
+}
+
+ddBool ddCond::waitUntil(ddMutex *pMutex, ddUInt32 ms)
+{
+	return dPtr()->waitUntil(pMutex, ms);
 }
 

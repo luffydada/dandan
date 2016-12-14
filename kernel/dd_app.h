@@ -29,7 +29,6 @@ public:
 	static ddVoid startup(ddpCChar pName, ddBool isServer = no);
 	ddInt run();
 	ddVoid quit();
-
 };
 
 #endif // dd_app_h

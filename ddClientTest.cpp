@@ -20,7 +20,8 @@ public:
 
 	virtual ddVoid onInitApp() {
 		dd_log_d("ddClientTest,onInitApp\n");
-		m_testThread1.start();
+		m_testThread1.create();
+		m_mediaDevice.start();
 	}
 
 	virtual ddVoid onTimer(ddTimer* pTimer) {
@@ -32,8 +33,8 @@ public:
 					ddUInt8 ok = 33;
 					ddCommand cmd(this, DDDEF_IOCOMMAND_RADIO, DDENUM_COMMAND_SERVICE, &ok, 1);
 					cmd.download();
-			m_testThread1.start();
-			m_testThread2.start();
+			m_testThread1.create();
+			m_testThread2.create();
 		}
 	}
 		
@@ -68,6 +69,7 @@ private:
 	ddTimer m_testTimer;
 	ddThread m_testThread1;
 	ddThread m_testThread2;
+	ddMediaDevice m_mediaDevice;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
