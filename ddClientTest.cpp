@@ -9,9 +9,11 @@
 *                                                                             *
 ******************************************************************************/
 #include "dandan.h"
-class ddClientTest: public ddApp, public ddTimer::interface, public ddSrvManager::/*listener*/notifier, ddThread::interface {
+class ddClientTest: public ddApp, public ddTimer::interface, public ddSrvManager::/*listener*/notifier
+	, public ddThread::interface
+	, public ddMediaDevice::interface {
 public:
-	ddClientTest() : m_testTimer(this), m_testThread1(this), m_testThread2(this) {
+	ddClientTest() : m_testTimer(this), m_testThread1(this), m_testThread2(this), m_mediaDevice(this) {
 		m_testTimer.setTimer(3000);
 	}
 
@@ -65,6 +67,13 @@ public:
 		}
 	}
 
+	virtual ddVoid onMediadevice_attached(emMediaDeviceType device) {
+		dd_log_d("onMediadevice_attached,device:%d\n", device);
+	}
+
+	virtual ddVoid onMediadevice_detached(emMediaDeviceType device) {
+		dd_log_d("onMediadevice_detached,device:%d\n", device);
+	}
 private:
 	ddTimer m_testTimer;
 	ddThread m_testThread1;

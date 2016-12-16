@@ -11,15 +11,26 @@
 #ifndef dd_mediadevice_h
 #define dd_mediadevice_h
 
+typedef enum {
+	DDENUM_MEDIADEVICE_UNKNOW,
+	DDENUM_MEDIADEVICE_SDCARD,
+	DDENUM_MEDIADEVICE_USB,
+	DDENUM_MEDIADEVICE_IPOD
+}emMediaDeviceType, *pemMediaDeviceType;
+
 class ddMediaDevicePrivate;
 class ddMediaDevice {
 	DD_PRIVATE_DECLARE(ddMediaDevice)
 public:
 	class interface {
-		virtual ~interface();
+	public:
+		virtual ~interface() {}
+		virtual ddVoid onMediadevice_attached(emMediaDeviceType device) {}
+		virtual ddVoid onMediadevice_detached(emMediaDeviceType device) {}
 	};
-	ddMediaDevice();
+	ddMediaDevice(interface *pOwner);
 	~ddMediaDevice();
+	ddVoid setOwner(interface *pOwner);
 	ddBool start();
 };
 

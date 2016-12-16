@@ -17,7 +17,7 @@
 class ddMediaDevicePrivate : public ddPrivateBase, public ddThread::interface {
 	DD_PUBLIC_DECLARE(ddMediaDevice)
 public:
-	ddMediaDevicePrivate() : m_socketFd(-1), m_thread(this), m_isExit(no) {
+	ddMediaDevicePrivate() : m_pOwner(nil), m_socketFd(-1), m_thread(this), m_isExit(no) {
 		FD_ZERO(&m_fds);
 		m_thread.create();
 	}
@@ -42,13 +42,16 @@ public:
 				select(m_socketFd + 1, &m_fds, nil, nil, nil);  
 				/* receive data */  
 				memset(data, 0, sizeof(data));
-				ssize_t rcvlen = recv(m_socketFd, &data, sizeof(data), 0);  
-				if (rcvlen > 0) {  
-					dd_log_i("netlink recv:%s\n", data);
+				if ( 0 < recv(m_socketFd, &data, sizeof(data), 0) ) {  
+					parseData(data);
 				}  
 			}
 			m_mutex.unlock();
 		}
+	}
+
+	ddVoid setOwner(ddMediaDevice::interface *pOwner) {
+		m_pOwner = pOwner;
 	}
 
 	ddBool start() {
@@ -58,7 +61,7 @@ public:
 				dd_log_w("socket,failed,error:%s\n", strerror(errno));
 				return no;
 			}
-			ddUInt16 bufferSize = 512;
+			ddUInt16 bufferSize = 1024;
 			setsockopt(m_socketFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
 			struct sockaddr_nl addr;
 			memset(&addr, 0, sizeof(addr));
@@ -79,7 +82,26 @@ public:
 		return no;
 	}
 
+	ddVoid parseData(ddpCChar data) {
+		dd_log_i("netlink parseData:%s\n", data);
+		if ( data && strlen(data) ) {
+			if ( !strncmp(data, "add@", 4) ) {
+				if ( m_pOwner ) {
+					emMediaDeviceType device = DDENUM_MEDIADEVICE_USB;
+					m_pOwner->onMediadevice_attached(device);
+				}
+			} else if ( !strncmp(data, "change@", 7) ) {
+			} else if ( !strncmp(data, "remove@", 7) ) {
+				if ( m_pOwner ) {
+					emMediaDeviceType device = DDENUM_MEDIADEVICE_USB;
+					m_pOwner->onMediadevice_detached(device);
+				}
+			}
+		}
+	}
+
 private:
+	ddMediaDevice::interface *m_pOwner;
 	int m_socketFd;
 	fd_set m_fds; 
 	ddMutex m_mutex;
@@ -89,14 +111,20 @@ private:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-ddMediaDevice::ddMediaDevice()
+ddMediaDevice::ddMediaDevice(interface *pOwner)
 {
 	DD_D_NEW(ddMediaDevicePrivate);
+	setOwner(pOwner);
 }
 
 ddMediaDevice::~ddMediaDevice()
 {
 	DD_D_DELETE();
+}
+
+ddVoid ddMediaDevice::setOwner(interface *pOwner)
+{
+	dPtr()->setOwner(pOwner);
 }
 
 ddBool ddMediaDevice::start()
