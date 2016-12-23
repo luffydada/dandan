@@ -11,9 +11,10 @@
 #include "dandan.h"
 class ddClientTest: public ddApp, public ddTimer::interface, public ddSrvManager::/*listener*/notifier
 	, public ddThread::interface
-	, public ddMediaDevice::interface {
+	, public ddMediaDevice::interface
+	, public ddMediaPlayer::interface {
 public:
-	ddClientTest() : m_testTimer(this), m_testThread1(this), m_testThread2(this), m_mediaDevice(this) {
+	ddClientTest() : m_testTimer(this), m_testThread1(this), m_testThread2(this), m_mediaDevice(this), m_mediaPlayer(this){
 		m_testTimer.setTimer(3000);
 	}
 
@@ -37,6 +38,9 @@ public:
 					cmd.download();
 			m_testThread1.create();
 			m_testThread2.create();
+//			m_mediaPlayer.playFile("/media/eddy/WANGYING/video/MKV/400x240.mkv");
+//			m_mediaPlayer.playFile("/media/eddy/WANGYING/music/AAC/陈小春-没那种命.aac");
+			m_mediaPlayer.playFile("/media/eddy/WANGYING/music/带封面的歌曲/北京欢迎你-群星.mp3");
 		}
 	}
 		
@@ -74,11 +78,37 @@ public:
 	virtual ddVoid onMediadevice_detached(emMediaDeviceType device) {
 		dd_log_d("onMediadevice_detached,device:%d\n", device);
 	}
+
+	virtual ddVoid onMediaPlayer_process(ddUInt32 current, ddUInt32 duration) {
+		dd_log_d("onMediaPlayer_process,current:%d,duration:%d\n", current, duration);
+	}
+
+	virtual ddVoid onMediaPlayer_playState(emMediaPlayState state) {
+		dd_log_d("onMediaPlayer_playState,state:%d\n", state);
+	}
+
+	virtual ddVoid onMediaPlayer_id3Info(ddpCChar pTitle, ddpCChar pArtist, ddpCChar pAlbum) {
+		dd_log_d("onMediaPlayer_id3Info,pTitle:%s,pArtist:%s,pAlbum:%s\n", pTitle, pArtist, pAlbum);
+	}
+
+	virtual ddVoid onMediaPlayer_playEnd() {
+		dd_log_d("onMediaPlayer_playEnd\n");
+	}
+
+	virtual ddVoid onMediaPlayer_playError(ddpCChar pError) {
+		dd_log_d("onMediaPlayer_playError,error:%s\n", pError);
+	}
+
+	virtual ddVoid onMediaPlayer_playWarning(ddpCChar pWarning) {
+		dd_log_d("onMediaPlayer_playError,warning:%s\n", pWarning);
+	}
+
 private:
 	ddTimer m_testTimer;
 	ddThread m_testThread1;
 	ddThread m_testThread2;
 	ddMediaDevice m_mediaDevice;
+	ddMediaPlayer m_mediaPlayer;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
