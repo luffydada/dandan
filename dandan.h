@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <string.h>
 #include <string>
 #include <vector>
@@ -27,6 +29,8 @@
 #include "utility/dd_filemanager.h"
 #include "utility/dd_log.h"
 #include "utility/dd_mediaplayer.h"
+#include "utility/dd_playlist.h"
+#include "utility/dd_reg.h"
 
 #include "service/dd_command.h"
 #include "service/dd_device.h"

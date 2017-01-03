@@ -17,7 +17,18 @@ ddBool ddFileManager::isFileExist(ddpCChar path)
 	}
 	return !access(path, F_OK);
 }
-
+ 
+ddBool ddFileManager::isDir(ddpCChar pPath)
+{
+	if ( isFileExist(pPath) ) {
+		struct stat st = {0};
+		lstat(pPath, &st);
+		if (S_ISDIR(st.st_mode)) {
+			return yes;
+		}
+	}
+	return no;
+}
 ddBool ddFileManager::isFileReadable(ddpCChar path)
 {
 	if ( isFileExist(path) ) {

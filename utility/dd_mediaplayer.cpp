@@ -163,7 +163,7 @@ public:
 				gint64 pos = 0, dur = 0;
 				if ( m_pOwner && gst_element_query_position(m_pPlaybin, GST_FORMAT_TIME, &pos)
 						&& gst_element_query_duration(m_pPlaybin, GST_FORMAT_TIME, &dur) ) {
-					m_pOwner->onMediaPlayer_process(pos/1000000000, dur/1000000000);
+					m_pOwner->onMediaPlayer_progress(pos/1000000000, dur/1000000000);
 				}
 			}
 		}

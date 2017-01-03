@@ -1,26 +1,26 @@
 /******************************************************************************
 *    Copyright (C), 2015 by HappyTown                                         *
-*    FileName:    dd_filemanager.h
+*    FileName:    dd_reg.h
 *    Author:      WangYing	                                             *
 *    Description:                                                             *
 *    History:                                                                 *
 *      <author>          <time>          <version>          <description>     *
-*        Xzj        2016-12-12 13:51      V1.0.0                build         *
+*        Xzj        2017-01-03 15:02      V1.0.0                build         *
 *                                                                             *
 ******************************************************************************/
-#ifndef dd_filemanager_h
-#define dd_filemanager_h
-class ddFileManager {
-public:	
-	static ddBool isFileExist(ddpCChar path);
-	static ddBool isDir(ddpCChar pPath);
-	static ddBool isFileReadable(ddpCChar path);
-	static ddBool isFileWritable(ddpCChar path);
-	static ddBool isFileExecutable(ddpCChar path);
+#ifndef dd_reg_h
+#define dd_reg_h
 
-	static ddBool getFileDirByPath(ddpCChar pPath, ddpChar pDir, ddUInt16 len);
-	static ddBool getFileNameByPath(ddpCChar pPath, ddpChar pName, ddUInt16 len);
+class ddRegPrivate;
+class ddReg {
+	DD_PRIVATE_DECLARE(ddReg)
+public:
+	ddReg(ddpCChar pPattern);///< 规则支持最大256个字符
+	~ddReg();
+	ddBool comp();
+    ddBool exec(ddpCChar data);
+    ddVoid error(ddpChar buf, ddUInt16 size);
+    ddVoid free();
 };
-
-#endif // dd_filemanager_h
+#endif // dd_reg_h
 

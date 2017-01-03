@@ -24,7 +24,7 @@ public:
 	class interface {
 	public:
 		virtual ~interface() {}
-		virtual ddVoid onMediaPlayer_process(ddUInt32 current, ddUInt32 duration) {}
+		virtual ddVoid onMediaPlayer_progress(ddUInt32 current, ddUInt32 duration) {}
 		virtual ddVoid onMediaPlayer_playState(emMediaPlayState state) {}
 		virtual ddVoid onMediaPlayer_id3Info(ddpCChar pTitle, ddpCChar pArtist, ddpCChar pAlbum) {}
 		virtual ddVoid onMediaPlayer_playEnd() {}

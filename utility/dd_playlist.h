@@ -1,38 +1,35 @@
 /******************************************************************************
 *    Copyright (C), 2015 by HappyTown                                         *
-*    FileName:    dd_mediadevice.h
+*    FileName:    dd_playlist.h
 *    Author:      WangYing	                                             *
 *    Description:                                                             *
 *    History:                                                                 *
 *      <author>          <time>          <version>          <description>     *
-*        Xzj        2016-12-14 13:51      V1.0.0                build         *
+*        Xzj        2017-01-03 16:32      V1.0.0                build         *
 *                                                                             *
 ******************************************************************************/
-#ifndef dd_mediadevice_h
-#define dd_mediadevice_h
+#ifndef dd_playlist_h
+#define dd_playlist_h
 
 typedef enum {
-	DDENUM_MEDIADEVICE_UNKNOW,
-	DDENUM_MEDIADEVICE_SDCARD,
-	DDENUM_MEDIADEVICE_USB,
-	DDENUM_MEDIADEVICE_IPOD
-}emMediaDeviceType, *pemMediaDeviceType;
+	DDENUM_FINDSTATUS_START,
+	DDENUM_FINDSTATUS_END
+} emPlaylistFindStatus;
 
-class ddMediaDevicePrivate;
-class ddMediaDevice {
-	DD_PRIVATE_DECLARE(ddMediaDevice)
+class ddPlaylistPrivate;
+class ddPlaylist {
+	DD_PRIVATE_DECLARE(ddPlaylist)
 public:
 	class interface {
 	public:
 		virtual ~interface() {}
-		virtual ddVoid onMediadevice_attached(emMediaDeviceType deviceType) {}
-		virtual ddVoid onMediadevice_detached(emMediaDeviceType deviceType) {}
+		virtual ddVoid onPlaylist_findStatus(emPlaylistFindStatus status) {}
 	};
-	ddMediaDevice(interface *pOwner);
-	~ddMediaDevice();
+	ddPlaylist(interface *pOwner);
+	~ddPlaylist();
 	ddVoid setOwner(interface *pOwner);
-	ddBool start();
+	ddVoid startFind(ddpCChar pPath);
+	ddVoid stopFind();
 };
-
-#endif // dd_mediadevice_h
+#endif // dd_playlist_h
 

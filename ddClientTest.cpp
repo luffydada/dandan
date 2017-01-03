@@ -71,16 +71,16 @@ public:
 		}
 	}
 
-	virtual ddVoid onMediadevice_attached(emMediaDeviceType device) {
-		dd_log_d("onMediadevice_attached,device:%d\n", device);
+	virtual ddVoid onMediadevice_attached(emMediaDeviceType deviceType) {
+		dd_log_d("onMediadevice_attached,device:%d\n", deviceType);
 	}
 
-	virtual ddVoid onMediadevice_detached(emMediaDeviceType device) {
-		dd_log_d("onMediadevice_detached,device:%d\n", device);
+	virtual ddVoid onMediadevice_detached(emMediaDeviceType deviceType) {
+		dd_log_d("onMediadevice_detached,device:%d\n", deviceType);
 	}
 
-	virtual ddVoid onMediaPlayer_process(ddUInt32 current, ddUInt32 duration) {
-		dd_log_d("onMediaPlayer_process,current:%d,duration:%d\n", current, duration);
+	virtual ddVoid onMediaPlayer_progress(ddUInt32 current, ddUInt32 duration) {
+		dd_log_d("onMediaPlayer_progress,current:%d,duration:%d\n", current, duration);
 	}
 
 	virtual ddVoid onMediaPlayer_playState(emMediaPlayState state) {

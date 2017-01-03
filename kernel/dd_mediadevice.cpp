@@ -8,16 +8,16 @@
 *        Xzj        2016-12-14 13:51      V1.0.0                build         *
 *                                                                             *
 ******************************************************************************/
-//#include <sys/types.h>
 #include <sys/socket.h>
 #include <linux/netlink.h>
 
 #include "../dandan.h"
 
+ddpCChar PATTERN = "block/sd[a-z]/sd[a-z][1-9]?$";
 class ddMediaDevicePrivate : public ddPrivateBase, public ddThread::interface {
 	DD_PUBLIC_DECLARE(ddMediaDevice)
 public:
-	ddMediaDevicePrivate() : m_pOwner(nil), m_socketFd(-1), m_thread(this), m_isExit(no) {
+	ddMediaDevicePrivate() : m_pOwner(nil), m_socketFd(-1), m_thread(this), m_isExit(no), m_reg(PATTERN) {
 		FD_ZERO(&m_fds);
 		m_thread.create();
 	}
@@ -35,6 +35,7 @@ public:
 	
 	virtual ddVoid onThread(ddThread* pThread) {
 		if ( pThread == &m_thread ) {
+			m_reg.comp();
 			ddChar data[1024] = {0};
 			m_mutex.lock();
 			m_cond.wait(&m_mutex);
@@ -83,18 +84,17 @@ public:
 	}
 
 	ddVoid parseData(ddpCChar data) {
-		dd_log_i("netlink parseData:%s\n", data);
 		if ( data && strlen(data) ) {
-			if ( !strncmp(data, "add@", 4) ) {
-				if ( m_pOwner ) {
-					emMediaDeviceType device = DDENUM_MEDIADEVICE_USB;
-					m_pOwner->onMediadevice_attached(device);
-				}
-			} else if ( !strncmp(data, "change@", 7) ) {
-			} else if ( !strncmp(data, "remove@", 7) ) {
-				if ( m_pOwner ) {
-					emMediaDeviceType device = DDENUM_MEDIADEVICE_USB;
-					m_pOwner->onMediadevice_detached(device);
+			if ( m_reg.exec(data) ) {
+				if ( !strncmp(data, "add@", 4) ) {
+					if ( m_pOwner ) {
+						m_pOwner->onMediadevice_attached(DDENUM_MEDIADEVICE_USB);
+					}
+				} else if ( !strncmp(data, "change@", 7) ) {
+				} else if ( !strncmp(data, "remove@", 7) ) {
+					if ( m_pOwner ) {
+						m_pOwner->onMediadevice_detached(DDENUM_MEDIADEVICE_USB);
+					}
 				}
 			}
 		}
@@ -108,6 +108,7 @@ private:
 	ddCond m_cond;
 	ddThread m_thread;
 	ddBool m_isExit;
+	ddReg m_reg;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
