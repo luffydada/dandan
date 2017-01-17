@@ -26,6 +26,7 @@
 
 #include "type/dd_type.h"
 
+#include "utility/dd_character.h"
 #include "utility/dd_filemanager.h"
 #include "utility/dd_log.h"
 #include "utility/dd_mediaplayer.h"

@@ -9,25 +9,28 @@
 *                                                                             *
 ******************************************************************************/
 #include <dirent.h>
+#include <taglib/tag.h>
+#include <taglib/fileref.h>
 
 #include "../dandan.h"
 
-const ddChar MUSICFILTER[][10] = {
-	"aac", "ac3", "arm", "ape", "m4a", "flac",  "mp3", "mp2", "ogg", "wav", "wma", "mid", "ra"
+ddpCChar MUSICFILTER[] = {
+	"aac", "ac3", "arm", "ape", "m4a", "flac",  "mp3", "mp2", "ogg", "wav", "wma", "mid", "ra", nil
 };
 
-const ddChar VIDEOFILTER[][10] = {
-	"3gp", "swf", "avi", "mp4", "mkv", "mpg", "wmv", "mp3", "rm", "rmvb", "m4v", "mov"
+ddpCChar VIDEOFILTER[] = {
+	"3gp", "swf", "avi", "mp4", "mkv", "mpg", "wmv", "mp3", "rm", "rmvb", "m4v", "mov", nil
 };
 
-const ddChar PHOTOFILTER[][10] = {
-	"bmp", "jpg", "tiff", "gif", "tga", "png", "jpeg"
+ddpCChar PHOTOFILTER[] = {
+	"bmp", "jpg", "tiff", "gif", "tga", "png", "jpeg", nil
 };
 
 class ddPlaylistPrivate : public ddPrivateBase, public ddThread::interface {
 	DD_PUBLIC_DECLARE(ddPlaylist)
 public:
 	ddPlaylistPrivate() :m_pOwner(nil), m_findThread(this), m_isExit(no) {
+		m_findThread.create();
 	}
 
 	~ddPlaylistPrivate() {
@@ -35,25 +38,23 @@ public:
 		m_mutex.lock();
 		m_cond.signal();
 		m_mutex.unlock();
-		cleanMusicData();
-		cleanVideoData();
-		cleanPhotoData();
+		cleanMediaData();
 	}
 
 	virtual ddVoid onThread(ddThread* pThread) {
 		if ( pThread == &m_findThread ) {
-			m_mutex.lock();
-			m_cond.wait(&m_mutex);
 			while ( !m_isExit ) {
+				m_mutex.lock();
+				m_cond.wait(&m_mutex);
 				if ( m_pOwner ) {
 					m_pOwner->onPlaylist_findStatus(DDENUM_FINDSTATUS_START);
 				}
 				enumFile(m_findPath.data());
+				m_mutex.unlock();
 				if ( m_pOwner ) {
 					m_pOwner->onPlaylist_findStatus(DDENUM_FINDSTATUS_END);
 				}
 			}
-			m_mutex.unlock();
 		}
 	}
 
@@ -65,9 +66,7 @@ public:
 		if ( pPath && strlen(pPath) ) {
 			m_mutex.lock();
 			m_findPath = pPath;
-			cleanMusicData();
-			cleanVideoData();
-			cleanPhotoData();
+			cleanMediaData();
 			m_cond.signal();
 			m_mutex.unlock();
 		}
@@ -97,83 +96,99 @@ public:
 								ddpChar pPos = strrchr(path, '.');
 								if ( pPos && strlen(pPos) > 1 ) {
 									ddBool isOkFile = no;
-									for ( int i = 0; i < sizeof(MUSICFILTER) / 10; i++ ) {
-										if ( !strcasecmp(pPos + 1, MUSICFILTER[i]) ) {
-											std::string *file = new std::string(path);
-											m_musicVector.push_back(file);
+									ddUInt8 count = 0;
+									while ( *(MUSICFILTER + count) ) {
+										if ( !strcasecmp(pPos + 1, *(MUSICFILTER + count)) ) {
 											isOkFile = yes;
+											pstMediaInfo file = new stMediaInfo;
+											file->type = DDENUM_MEDIATYPE_MUSIC;
+											file->data.filePath = path;
+											ddChar name[DD_MAXPATH] = {0};
+											ddFileManager::getFileNameByPath(path, name, DD_MAXPATH);
+											file->data.fileName = name;
 //											printf("music push file:%s\n", file->data());
-/*											TagLib::FileRef *pTag = new TagLib::FileRef(path);
-											if ( !pTag->isNull() && pTag->tag() ) {
-												g_tagVector.push_back(pTag);
-											}*/
+											TagLib::FileRef tag(path);
+											if ( !tag.isNull() && tag.tag() ) {
+												file->data.id3.title = tag.tag()->title().toCString(yes);
+												file->data.id3.artist = tag.tag()->artist().toCString(yes);
+												file->data.id3.album = tag.tag()->album().toCString(yes);
+											}
+											m_mediaVector.push_back(file);
+											break;
 										}
+										++count;
 									}
 									if ( !isOkFile ) {
-										for ( int i = 0; i < sizeof(VIDEOFILTER) / 10; i++ ) {
-											if ( !strcasecmp(pPos + 1, VIDEOFILTER[i]) ) {
-												std::string *file = new std::string(path);
-												m_videoVector.push_back(file);
+										count = 0;
+										while ( *(VIDEOFILTER + count) ) {
+											if ( !strcasecmp(pPos + 1, *(VIDEOFILTER + count)) ) {
 												isOkFile = yes;
+												pstMediaInfo file = new stMediaInfo;
+												file->type = DDENUM_MEDIATYPE_VIDEO;
+												file->data.filePath = path;
+												ddChar name[DD_MAXPATH] = {0};
+												ddFileManager::getFileNameByPath(path, name, DD_MAXPATH);
+												file->data.fileName = name;
 //												printf("video push file:%s\n", file->data());
-/*												TagLib::FileRef *pTag = new TagLib::FileRef(path);
-												if ( !pTag->isNull() && pTag->tag() ) {
-													g_tagVector.push_back(pTag);
-												}*/
+												TagLib::FileRef tag(path);
+												if ( !tag.isNull() && tag.tag() ) {
+													file->data.id3.title = tag.tag()->title().toCString(yes);
+													file->data.id3.artist = tag.tag()->artist().toCString(yes);
+													file->data.id3.album = tag.tag()->album().toCString(yes);
+												}
+												m_mediaVector.push_back(file);
+												break;
 											}
+											count++;
 										}
 									}
 									if ( !isOkFile ) {
-										for ( int i = 0; i < sizeof(PHOTOFILTER) / 10; i++ ) {
-											if ( !strcasecmp(pPos + 1, PHOTOFILTER[i]) ) {
-												std::string *file = new std::string(path);
-												m_photoVector.push_back(file);
+										count = 0;
+										while ( *(PHOTOFILTER + count) ) {
+											if ( !strcasecmp(pPos + 1, *(PHOTOFILTER + count)) ) {
 												isOkFile = yes;
+												pstMediaInfo file = new stMediaInfo;
+												file->type = DDENUM_MEDIATYPE_PHOTO;
+												file->data.filePath = path;
+												ddChar name[DD_MAXPATH] = {0};
+												ddFileManager::getFileNameByPath(path, name, DD_MAXPATH);
+												file->data.fileName = name;
+												TagLib::FileRef tag(path);
+												if ( !tag.isNull() && tag.tag() ) {
+													file->data.id3.title = tag.tag()->title().toCString(yes);
+													file->data.id3.artist = tag.tag()->artist().toCString(yes);
+													file->data.id3.album = tag.tag()->album().toCString(yes);
+												}
+												m_mediaVector.push_back(file);
 //												printf("photo push file:%s\n", file->data());
-/*												TagLib::FileRef *pTag = new TagLib::FileRef(path);
-												if ( !pTag->isNull() && pTag->tag() ) {
-													g_tagVector.push_back(pTag);
-												}*/
+												break;
 											}
+											count ++;
 										}
 									}
 								}
 							}
 						}
 					}
-				} while(pDirent);
+				} while ( pDirent );
 				::closedir(pDir);
 				return yes;
 			} else {
-				printf("opendir:%s,error:%s\n", pDirName, strerror(errno));
+				dd_log_d("opendir:%s,error:%s\n", pDirName, strerror(errno));
 			}
 		}
 		return no;
 	}
 
-	ddVoid cleanMusicData() {
-		std::vector<std::string *>::const_iterator it = m_musicVector.begin();
-		while ( it != m_musicVector.end() ) {
+	ddVoid cleanMediaData() {
+		std::vector<pstMediaInfo>::const_iterator it = m_mediaVector.begin();
+		while ( it != m_mediaVector.end() ) {
 			delete *it;
 			it++;
 		}
+		m_mediaVector.clear();
 	}
 
-	ddVoid cleanVideoData() {
-		std::vector<std::string *>::const_iterator it = m_videoVector.begin();
-		while ( it != m_videoVector.end() ) {
-			delete *it;
-			it++;
-		}
-	}
-
-	ddVoid cleanPhotoData() {
-		std::vector<std::string *>::const_iterator it = m_photoVector.begin();
-		while ( it != m_photoVector.end() ) {
-			delete *it;
-			it++;
-		}
-	}
 private:
 	ddPlaylist::interface* m_pOwner;
 	ddThread m_findThread;
@@ -181,9 +196,7 @@ private:
 	ddCond m_cond;
 	ddBool m_isExit;
 	std::string m_findPath;
-	std::vector<std::string *> m_musicVector;
-	std::vector<std::string *> m_videoVector;
-	std::vector<std::string *> m_photoVector;
+	std::vector<pstMediaInfo> m_mediaVector;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -211,5 +224,25 @@ ddVoid ddPlaylist::startFind(ddpCChar pPath)
 ddVoid ddPlaylist::stopFind()
 {
 	dPtr()->stopFind();
+}
+
+ddVoid ddPlaylist::requestMusicListByName()
+{
+}
+
+ddVoid ddPlaylist::requestMusicListByArtist()
+{
+}
+
+ddVoid ddPlaylist::requestMusicListByAlbum()
+{
+}
+
+ddVoid ddPlaylist::requestVideoList()
+{
+}
+
+ddVoid ddPlaylist::requestPhotoList()
+{
 }
 

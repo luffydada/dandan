@@ -36,6 +36,8 @@ typedef long					ddLong;
 typedef unsigned long			ddULong;
 typedef float					ddFloat;
 typedef double					ddDouble;
+typedef char					ddUtf8;
+typedef short					ddUtf16;
 
 typedef ddVoid *				ddPointer;
 typedef const ddVoid *			ddCPointer;
@@ -61,6 +63,10 @@ typedef ddFloat *				ddpFloat;
 typedef const ddFloat *			ddpCFloat;
 typedef ddDouble *				ddpDouble;
 typedef const ddDouble *		ddpCDouble;
+typedef ddUtf8 *				ddpUtf8;
+typedef const ddUtf8 *			ddpCUtf8;
+typedef ddUtf16 *				ddpUtf16;
+typedef const ddUtf16 *			ddpCUtf16;
 
 /* --------------------------------------------------------------------------*/
 /**

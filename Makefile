@@ -19,7 +19,7 @@ ifeq ($(DD_DEBUG), yes)
 	DD_CFLAGS := -g -D__DD_DEBUG__
 	DD_CPPFLAGS := -g -D__DD_DEBUG__
 endif
-DD_LIBS := -lglib-2.0 -lgio-2.0 -lgstreamer-1.0
+DD_LIBS := -lglib-2.0 -lgio-2.0 -lgstreamer-1.0 -ltag
 ifeq ($(DD_ARM), yes)
 	DD_CC := $(CROSS_COMPILE)gcc
 	DD_CXX := $(CROSS_COMPILE)g++
