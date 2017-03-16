@@ -9,6 +9,8 @@ makefile~
 .out
 .po.out
 
+README.txt~
+
 # c++:
 *.cpp~
 
