@@ -8,5 +8,10 @@ TARGET_LINK_LIBRARIES(ddServer dandan)
 # 设置输出目录
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/output/bin)
 
+INSTALL(TARGETS ddClient ddServer
+	RUNTIME DESTINATION bin
+	)
+
 ADD_DEPENDENCIES(ddClient dandan_shared)
 ADD_DEPENDENCIES(ddServer dandan_shared)
+

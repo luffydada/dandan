@@ -14,10 +14,10 @@ EOH
 	exit 1;
 }
 
-prefix=/home/eddy/Programming/sdk/study/dandan/dandan/thirdparty/taglib-1.10/release
-exec_prefix=/home/eddy/Programming/sdk/study/dandan/dandan/thirdparty/taglib-1.10/release
-libdir=/home/eddy/Programming/sdk/study/dandan/dandan/thirdparty/taglib-1.10/release/lib
-includedir=/home/eddy/Programming/sdk/study/dandan/dandan/thirdparty/taglib-1.10/release/include
+prefix=/home/eddy/Programming/sdk/study/dandan/dandan/thirdparty/taglib/taglib-1.10/release
+exec_prefix=/home/eddy/Programming/sdk/study/dandan/dandan/thirdparty/taglib/taglib-1.10/release
+libdir=/home/eddy/Programming/sdk/study/dandan/dandan/thirdparty/taglib/taglib-1.10/release/lib
+includedir=/home/eddy/Programming/sdk/study/dandan/dandan/thirdparty/taglib/taglib-1.10/release/include
 
 flags=""
 
