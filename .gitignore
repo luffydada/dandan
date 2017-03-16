@@ -5,11 +5,16 @@ makefile~
 *.so
 *.swp
 .o
+.in.out
+.out
+.po.out
 
 # c++:
+*.cpp~
 
 #dir
 output
+build
 
 # My configurations:
 .gitignore~

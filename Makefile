@@ -107,9 +107,9 @@ lib : $(DD_OBJS)
 
 test : DD_LDFLAGS += -L$(DD_OUTPUT_DIR)
 test : DD_LIBS += -ldandan
-test : ddServerTest.cpp ddClientTest.cpp
-	$(DD_CXX) $(DD_CPPFLAGS) ddServerTest.cpp -o $(DD_OUTPUT_DIR)/ddServer $(DD_LDFLAGS) $(DD_LIBS) 
-	$(DD_CXX) $(DD_CPPFLAGS) ddClientTest.cpp -o $(DD_OUTPUT_DIR)/ddClient $(DD_LDFLAGS) $(DD_LIBS) 
+test : test/ddServerTest.cpp test/ddClientTest.cpp
+	$(DD_CXX) $(DD_CPPFLAGS) test/ddServerTest.cpp -o $(DD_OUTPUT_DIR)/ddServer $(DD_LDFLAGS) $(DD_LIBS) 
+	$(DD_CXX) $(DD_CPPFLAGS) test/ddClientTest.cpp -o $(DD_OUTPUT_DIR)/ddClient $(DD_LDFLAGS) $(DD_LIBS) 
 
 clean:
 	-rm -R $(DD_OUTPUT_DIR)
