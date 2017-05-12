@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--i am a test comment-->
+<fruitPrice id="1">
+    <banana color="yellow">
+        <name>banana</name>
+        <price>4元/斤</price>
+    </banana>
+    <apple color="red">
+        <apple>apple</apple>
+        <price>5元/斤</price>
+    </apple>
+</fruitPrice>

@@ -18,5 +18,8 @@ README.txt~
 output
 build
 
+#thirdparty libarary source
+protobuf-2.5.0
+
 # My configurations:
 .gitignore~
