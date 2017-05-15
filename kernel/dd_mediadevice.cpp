@@ -35,7 +35,7 @@ public:
 	
 	virtual ddVoid onThread(ddThread* pThread) {
 		if ( pThread == &m_thread ) {
-			m_reg.comp();
+			m_reg.compile();
 			ddChar data[1024] = {0};
 			m_mutex.lock();
 			m_cond.wait(&m_mutex);
@@ -108,7 +108,7 @@ private:
 	ddCond m_cond;
 	ddThread m_thread;
 	ddBool m_isExit;
-	ddReg m_reg;
+	ddRegular m_reg;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

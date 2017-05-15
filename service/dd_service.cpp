@@ -279,7 +279,7 @@ ddVoid ddService::startupServer()
 {
 	ddChar path[DD_MAXPATH] = {0};
 	if ( ddProcess::getModulePath(path, DD_MAXPATH) ) {
-		strcat(path, "ddServer");
+		strcat(path, "dd_dae");
 		ddBool ret = ddProcess::createProcess(path, NULL);
 		dd_log_d("startupServer,name:%s,ret:%d\n", path, ret);
 	}

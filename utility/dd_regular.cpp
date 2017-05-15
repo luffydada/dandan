@@ -1,25 +1,25 @@
 /******************************************************************************
 *    Copyright (C), 2015 by HappyTown                                         *
-*    FileName:    dd_reg.cpp
+*    FileName:    dd_regular.cpp
 *    Author:      WangYing	                                             *
 *    Description:                                                             *
 *    History:                                                                 *
 *      <author>          <time>          <version>          <description>     *
-*        Xzj        2017-01-03 15:02      V1.0.0                build         *
+*        Xzj        2017-05-15 14:03      V1.0.0                build         *
 *                                                                             *
 ******************************************************************************/
 #include <regex.h>
 
 #include "../dandan.h"
 
-class ddRegPrivate : public ddPrivateBase {
-	DD_PUBLIC_DECLARE(ddReg)
+class ddRegularPrivate : public ddPrivateBase {
+	DD_PUBLIC_DECLARE(ddRegular)
 public:
-	ddRegPrivate() :m_isComp(no), m_ret(0) {
-		memset(&m_reg, 0, sizeof(m_reg));
+	ddRegularPrivate() :m_isComp(no), m_ret(0) {
+		memset(&m_regular, 0, sizeof(m_regular));
 	}
 
-	~ddRegPrivate() {
+	~ddRegularPrivate() {
 		free();
 	}
 
@@ -31,9 +31,9 @@ public:
 		return no;
 	}
 
-	ddBool comp() {
+	ddBool compile() {
 		if ( !m_isComp ) {
-			m_ret = regcomp(&m_reg, m_strPattern.data(), REG_EXTENDED);
+			m_ret = regcomp(&m_regular, m_strPattern.data(), REG_EXTENDED);
 			if ( !m_ret ) {
 				m_isComp = yes;
 			}
@@ -44,7 +44,7 @@ public:
     ddBool exec(ddpCChar data) {
 		if ( m_isComp && data && strlen(data)) {
 			regmatch_t match[1] = {0};
-			m_ret = regexec(&m_reg, data, 1, match, 0);
+			m_ret = regexec(&m_regular, data, 1, match, 0);
 			return !m_ret;
 		}
 		return no;
@@ -52,49 +52,49 @@ public:
 
     ddVoid error(ddpChar buf, ddUInt16 size) {
 		if ( buf && size ) {
-			regerror(m_ret, &m_reg, buf, size);
+			regerror(m_ret, &m_regular, buf, size);
 		}
 	}
 
     ddVoid free() {
-		regfree(&m_reg);
+		regfree(&m_regular);
 	}
 
 private:
-	regex_t m_reg;
+	regex_t m_regular;
 	std::string m_strPattern;
 	ddBool m_isComp;
 	ddInt m_ret;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-ddReg::ddReg(ddpCChar pPattern)
+ddRegular::ddRegular(ddpCChar pPattern)
 {
-	DD_D_NEW(ddRegPrivate);
+	DD_D_NEW(ddRegularPrivate);
 	dPtr()->setPattern(pPattern);
 }
 
-ddReg::~ddReg()
+ddRegular::~ddRegular()
 {
 	DD_D_DELETE();
 }
 
-ddBool ddReg::comp()
+ddBool ddRegular::compile()
 {
-	return dPtr()->comp();
+	return dPtr()->compile();
 }
 
-ddBool ddReg::exec(ddpCChar data)
+ddBool ddRegular::exec(ddpCChar data)
 {
 	return dPtr()->exec(data);
 }
 
-ddVoid ddReg::error(ddpChar buf, ddUInt16 size)
+ddVoid ddRegular::error(ddpChar buf, ddUInt16 size)
 {
 	dPtr()->error(buf, size);
 }
 
-ddVoid ddReg::free()
+ddVoid ddRegular::free()
 {
 	dPtr()->free();
 }

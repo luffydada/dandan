@@ -47,16 +47,27 @@ private:
 	GMainLoop *m_pMainLoop;
 	GMainContext* m_pMainContext;
 	ddTimer m_timer;
+	static ddApp* s_app;
 };
 
+ddApp* ddAppPrivate::s_app = nil;
 ///////////////////////////////////////////////////////////////////////////////
+ddVoid ddApp::interface::onDownload(ddpCByte data, ddUInt16 len)
+{
+	if ( ddApp* pApp = ddApp::sharedApp() ) {
+		pApp->onDownload(data, len);
+	}
+}
+
 ddApp::ddApp()
 {
+	ddAppPrivate::s_app = this;
 	DD_D_NEW(ddAppPrivate);
 }
 
 ddApp::~ddApp()
 {
+	ddAppPrivate::s_app = nil;
 	DD_D_DELETE();
 }
 
@@ -67,6 +78,11 @@ ddVoid ddApp::onInitApp()
 ddVoid ddApp::startup(ddpCChar pName, ddBool isServer/* = no*/)
 {
 	ddService::startup(pName, isServer);
+}
+
+ddApp* ddApp::sharedApp()
+{
+	return ddAppPrivate::s_app;
 }
 
 ddInt ddApp::run()

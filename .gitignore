@@ -2,12 +2,11 @@
 tags
 Makefile~
 makefile~
-*.so
 *.swp
-.o
-.in.out
-.out
-.po.out
+*.o
+*.in.out
+*.out
+*.po.out
 
 README.txt~
 

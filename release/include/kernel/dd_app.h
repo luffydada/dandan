@@ -13,11 +13,10 @@ class ddAppPrivate;
 class ddApp : public ddCommand::interface {
 	DD_PRIVATE_DECLARE(ddApp)
 public:
-/*	class interface : public ddCommand::interface {
+	class interface : public ddCommand::interface {
 	public:
-		virtual ~interface();
-		virtual ddVoid onProtocol(ddCommand &cmd) = 0;
-	};*/
+		virtual ddVoid onDownload(ddpCByte data, ddUInt16 len);
+	};
 	ddApp();
 	virtual ~ddApp();
 
@@ -27,6 +26,7 @@ public:
 	/* 自定义函数 */
 	virtual ddVoid onInitApp();
 	static ddVoid startup(ddpCChar pName, ddBool isServer = no);
+	static ddApp* sharedApp();
 	ddInt run();
 	ddVoid quit();
 };

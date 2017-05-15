@@ -31,7 +31,7 @@
 #include "utility/dd_log.h"
 #include "utility/dd_mediaplayer.h"
 #include "utility/dd_playlist.h"
-#include "utility/dd_reg.h"
+#include "utility/dd_regular.h"
 
 #include "service/dd_command.h"
 #include "service/dd_device.h"
