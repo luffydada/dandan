@@ -14,14 +14,18 @@ ddCommand::interface::~interface() {}
 ddVoid ddCommand::interface::onCommit(ddpCByte data, ddUInt16 len) {}
 ddVoid ddCommand::interface::onDownload(ddpCByte data, ddUInt16 len) {}
 
-ddCommand::ddCommand(interface *pOwner, ddUInt16 cmd/* = 0*/, emCommandType type/* = DDENUM_COMMAND_SERVICE*/, ddpCByte data/* = nil*/, ddUInt16 len/* = 0*/)
+ddCommand::ddCommand(interface *pOwner, ddUInt16 cmd/* = 0*/, emCommandType type/* = DDENUM_COMMAND_SERVICE*/, ddUInt16 len/* = 0*/, ddpCByte data/* = nil*/)
 {
 	m_pOwner = pOwner;
 	m_len = 0;
 	memset(m_data, 0, DD_MAXDATA);
 	setType(type);
-	setCommand(cmd);
-	setData(data, len);
+	command() = cmd;
+	len = len > maxLength() ? maxLength() : len;
+	length() = len;
+	if ( data ) {
+		memcpy(this->data(), data, len);
+	}
 }
 
 ddCommand::ddCommand(ddpCByte data, ddUInt16 len)
@@ -31,8 +35,10 @@ ddCommand::ddCommand(ddpCByte data, ddUInt16 len)
 	memset(m_data, 0, DD_MAXDATA);
 	if ( data && len > 3 ) {
 		setType(emCommandType(*data));
-		setCommand(*(reinterpret_cast<const ddUInt16 *>(data + 1)));
-		setData(data + 3, len - 3);
+		command() = *(reinterpret_cast<const ddUInt16 *>(data + 1));
+		len = len > (maxLength() + 3) ? (maxLength() + 3) : len;
+		length() = len - 3;
+		memcpy(this->data(), data + 3, len - 3);
 	}
 }
 
@@ -40,19 +46,9 @@ ddCommand::~ddCommand()
 {
 }
 
-ddVoid ddCommand::setCommand(ddUInt16 cmd)
-{
-	*(reinterpret_cast<ddUInt16 *>(m_data + 1)) = cmd;
-}
-
-ddUInt16 ddCommand::command()
+ddUInt16& ddCommand::command()
 {
 	return *(reinterpret_cast<ddUInt16 *>(m_data + 1));
-}
-
-ddVoid ddCommand::setType(emCommandType type)
-{
-	m_data[0] = ddByte(type);
 }
 
 emCommandType ddCommand::type()
@@ -60,20 +56,26 @@ emCommandType ddCommand::type()
 	return emCommandType(m_data[0]);
 }
 
-ddVoid ddCommand::setData(ddpCByte data, ddUInt16 len, ddUInt16 pos/* = 0*/)
+emCommandType ddCommand::setType(emCommandType type)
 {
-	if ( data && (pos + len) <= maxLength() ) {
-		memcpy(m_data + 3 + pos, data, len);
-		m_len = m_len < (pos + len) ? (pos + len) : m_len;
-	}
+	m_data[0] = ddByte(type);
+	return type;
 }
 
-ddpCByte ddCommand::data()
+ddByte& ddCommand::operator[](ddUInt16 pos)
+{
+	if ( pos >= maxLength() ) {
+		pos = 0;
+	}
+	return m_data[3 + pos];
+}
+
+ddpByte ddCommand::data()
 {
 	return m_data + 3;
 }
 
-ddUInt16 ddCommand::length()
+ddUInt16& ddCommand::length()
 {
 	return m_len;
 }

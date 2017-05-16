@@ -62,7 +62,7 @@ public:
 
 	static ddVoid onGBusAcquiredCallback(GDBusConnection *connection, const gchar *name, gpointer user_data) {
 		ddServicePrivate * pthis = (ddServicePrivate *)user_data;
-		dd_log_d("onGBusAcquiredCallback entry,name:%s,isServer:%d\n", name, pthis->m_isServer);
+		dd_log_d("onGBusAcquiredCallback,name:%s,isServer:%d\n", name, pthis->m_isServer);
 		if ( pthis->m_isServer ) {
 			/** Second step: Try to get a connection to the given bus. */
 			pthis->m_pService = com_dd_service_skeleton_new();
@@ -139,7 +139,6 @@ public:
 
 	static gboolean on_handle_ioctl(ComDdService *object, GDBusMethodInvocation *invocation, 
 			guint arg_iocmd, GVariant *arg_pin, guint arg_uin, guint arg_uout) {
-		dd_log_d("on_handle_ioctl,iocmd:%d,uin:%d,uout:%d\n", arg_iocmd, arg_uin, arg_uout);
 		gsize uin = 0;
 		const guchar *pin = (const guchar *)g_variant_get_fixed_array(arg_pin, &uin, sizeof(guchar));
 		ddByte pout[DD_MAXPATH] = {0};
@@ -159,7 +158,6 @@ public:
 	}
 
 	static ddVoid on_notification(ComDdService *object, GVariant *arg_data) {
-		dd_log_d("on_notification\n");
 		gsize uin = 0;
 		const guchar *pin = (const guchar *)g_variant_get_fixed_array(arg_data, &uin, sizeof(guchar));
 		DD_GLOBAL_INSTANCE_DO(ddSrvManager, notify(pin, uin));
@@ -201,7 +199,7 @@ public:
 				GVariant *out_pout = nil;
 				com_dd_service_call_ioctl_sync(m_pService, iocmd, arg_pin, uIn, uOut, &out_pout, nil, &pError);
 				if ( pError ) {
-					dd_log_i("ioctl,com_dd_service_call_ioctl_sync,error:%s\n", pError->message);
+					dd_log_e("ioctl,com_dd_service_call_ioctl_sync,error:%s\n", pError->message);
 					g_error_free(pError);
 					pError = nil;
 				}

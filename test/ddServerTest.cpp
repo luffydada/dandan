@@ -43,7 +43,7 @@ public:
 					dd_log_d("radio device,onIoctl,test,pin:%d\n", *(ddUInt8 *)pin);
 					*(ddUInt8 *)pout = *(ddUInt8 *)pin + 1;
 					ddUInt8 ok = 11;
-					ddCommand cmd(this, DDDEF_IOCOMMAND_RADIO + 1, DDENUM_COMMAND_APP, &ok, 1);
+					ddCommand cmd(this, DDDEF_IOCOMMAND_RADIO + 1, DDENUM_COMMAND_APP, 1, &ok);
 					cmd.commit();
 				}
 				break;
@@ -58,7 +58,7 @@ public:
 		if ( DDDEF_IOCOMMAND_RADIO == cmd.command() ) {
 			dd_log_d("ddRadioDevice,onProtocol,data:%d\n", *cmd.data());
 			ddUInt8 ok = 22;
-			ddCommand cmd2(this, DDDEF_IOCOMMAND_RADIO, DDENUM_COMMAND_SERVICE, &ok, 1);
+			ddCommand cmd2(this, DDDEF_IOCOMMAND_RADIO, DDENUM_COMMAND_SERVICE, 1, &ok);
 			cmd2.download();
 		}
 	}

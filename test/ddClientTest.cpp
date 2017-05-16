@@ -22,7 +22,7 @@ public:
 	}
 
 	virtual ddVoid onInitApp() {
-		dd_log_d("ddClientTest,onInitApp\n");
+		dd_log_i("ddClientTest,onInitApp\n");
 		m_testThread1.create();
 		m_mediaDevice.start();
 	}
@@ -34,7 +34,7 @@ public:
 			dd_log_d("ddClientTest,ioctl,pout:%d\n", data);
 */
 					ddUInt8 ok = 33;
-					ddCommand cmd(this, DDDEF_IOCOMMAND_RADIO, DDENUM_COMMAND_SERVICE, &ok, 1);
+					ddCommand cmd(this, DDDEF_IOCOMMAND_RADIO, DDENUM_COMMAND_SERVICE, 1, &ok);
 					cmd.download();
 			m_testThread1.create();
 			m_testThread2.create();
@@ -49,7 +49,7 @@ public:
 	}
 
 	virtual ddVoid onProtocol(ddCommand& cmd) {
-		dd_log_d("ddClientTest,onProtocol,cmd:%d\n", cmd.command());
+		dd_log_i("ddClientTest,onProtocol,cmd:%d\n", cmd.command());
 	}
 /*
 	virtual ddUInt16 myCommand() {
@@ -65,42 +65,42 @@ public:
 */
 	virtual ddVoid onThread(ddThread* pThread) {
 		if ( &m_testThread1 == pThread ) {
-			dd_log_d("test thread1 run\n");
+			dd_log_i("test thread1 run\n");
 		} else if ( &m_testThread2 == pThread ) {
-			dd_log_d("test thread2 run\n");
+			dd_log_i("test thread2 run\n");
 		}
 	}
 
 	virtual ddVoid onMediadevice_attached(emMediaDeviceType deviceType) {
-		dd_log_d("onMediadevice_attached,device:%d\n", deviceType);
+		dd_log_i("onMediadevice_attached,device:%d\n", deviceType);
 	}
 
 	virtual ddVoid onMediadevice_detached(emMediaDeviceType deviceType) {
-		dd_log_d("onMediadevice_detached,device:%d\n", deviceType);
+		dd_log_i("onMediadevice_detached,device:%d\n", deviceType);
 	}
 
 	virtual ddVoid onMediaPlayer_progress(ddUInt32 current, ddUInt32 duration) {
-		dd_log_d("onMediaPlayer_progress,current:%d,duration:%d\n", current, duration);
+		dd_log_i("onMediaPlayer_progress,current:%d,duration:%d\n", current, duration);
 	}
 
 	virtual ddVoid onMediaPlayer_playState(emMediaPlayState state) {
-		dd_log_d("onMediaPlayer_playState,state:%d\n", state);
+		dd_log_i("onMediaPlayer_playState,state:%d\n", state);
 	}
 
 	virtual ddVoid onMediaPlayer_id3Info(ddpCChar pTitle, ddpCChar pArtist, ddpCChar pAlbum) {
-		dd_log_d("onMediaPlayer_id3Info,pTitle:%s,pArtist:%s,pAlbum:%s\n", pTitle, pArtist, pAlbum);
+		dd_log_i("onMediaPlayer_id3Info,pTitle:%s,pArtist:%s,pAlbum:%s\n", pTitle, pArtist, pAlbum);
 	}
 
 	virtual ddVoid onMediaPlayer_playEnd() {
-		dd_log_d("onMediaPlayer_playEnd\n");
+		dd_log_i("onMediaPlayer_playEnd\n");
 	}
 
 	virtual ddVoid onMediaPlayer_playError(ddpCChar pError) {
-		dd_log_d("onMediaPlayer_playError,error:%s\n", pError);
+		dd_log_e("onMediaPlayer_playError,error:%s\n", pError);
 	}
 
 	virtual ddVoid onMediaPlayer_playWarning(ddpCChar pWarning) {
-		dd_log_d("onMediaPlayer_playError,warning:%s\n", pWarning);
+		dd_log_w("onMediaPlayer_playError,warning:%s\n", pWarning);
 	}
 
 private:

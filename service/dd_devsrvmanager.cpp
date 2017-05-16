@@ -182,6 +182,8 @@ public:
 	ddVoid notify(ddpCByte data, ddUInt16 len) {
 		if ( data && len ) {
 			ddCommand cmd(data, len);
+			dd_log_d("dd_devsrvmanager,notify,cmd type:%d,cmd:%d,notifier size:%d,listener size:%d,cmd[0]:%d\n", \
+					cmd.type(), cmd.command(), m_listNotifier.size(), m_listListener.size(), cmd[0]);
 			if ( DDENUM_COMMAND_SERVICE == cmd.type() ) {
 				std::list<ddSrvManager::listener *>::const_iterator it = m_listListener.begin();
 				while ( it != m_listListener.end() ) {

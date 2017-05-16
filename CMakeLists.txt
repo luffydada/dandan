@@ -39,7 +39,7 @@ TARGET_LINK_LIBRARIES(dandan_shared glib-2.0 gio-2.0 gstreamer-1.0 tag)
 SET_TARGET_PROPERTIES(dandan_shared PROPERTIES VERSION 1.1 SOVERSION 1)
 
 # 设置输出目录
-SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/output/lib)
+SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/release/lib)
 
 # 安装目录
 INSTALL(TARGETS dandan_shared

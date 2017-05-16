@@ -1,17 +1,13 @@
-LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/output/lib)
+LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/release/lib)
 
-ADD_EXECUTABLE(ddClient ddClientTest.cpp)
-ADD_EXECUTABLE(ddServer ddServerTest.cpp)
-TARGET_LINK_LIBRARIES(ddClient dandan)
-TARGET_LINK_LIBRARIES(ddServer dandan)
+ADD_EXECUTABLE(dd_client ddClientTest.cpp)
+ADD_EXECUTABLE(dd_dae ddServerTest.cpp)
+TARGET_LINK_LIBRARIES(dd_client dandan)
+TARGET_LINK_LIBRARIES(dd_dae dandan)
 
 # 设置输出目录
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/output/bin)
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/release/bin)
 
-INSTALL(TARGETS ddClient ddServer
-	RUNTIME DESTINATION bin
-	)
-
-ADD_DEPENDENCIES(ddClient dandan_shared)
-ADD_DEPENDENCIES(ddServer dandan_shared)
+ADD_DEPENDENCIES(dd_client dandan_shared)
+ADD_DEPENDENCIES(dd_dae dandan_shared)
 
