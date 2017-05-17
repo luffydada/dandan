@@ -102,7 +102,11 @@ class ddPrivateBase { public: ddPrivateBase(){} virtual ~ddPrivateBase(){} };
 #define DD_D_NEW(Class) m_pPrivate = new Class(); m_pPrivate->m_pBase = this
 #define DD_D_DELETE() if ( m_pPrivate ) delete m_pPrivate
 
-///< 全局模板类
+/* --------------------------------------------------------------------------*/
+/**
+ * @synopsis: 全局模板类
+ */
+/* --------------------------------------------------------------------------*/
 template <class T>
 class ddGlobalInstance {
 public:
@@ -127,4 +131,38 @@ private:
 template <class T> T *ddGlobalInstance<T>::s_pInstance = nil;
 #define DD_GLOBAL_INSTANCE_DO(t, f) if ( ddGlobalInstance<t>::instance() ) ddGlobalInstance<t>::instance()->f
 
+/* --------------------------------------------------------------------------*/
+/**
+ * @synopsis: 实例化interface宏，接收/处理协议
+ */
+/* --------------------------------------------------------------------------*/
+#define dd_service_instance(x) \
+	class dd##x##Instance: public ddSrvManager::notifier {\
+	public:\
+		virtual ddBool isMyCommand(ddUInt16 command) { return command > dd##x##Device::DDENUM_IOCODE_##x##_A && command < dd##x##Device::DDENUM_IOCODE_##x##_B; }\
+		virtual ddVoid onProtocol(ddCommand& cmd);\
+		ddVoid add(dd##x::interface * interface) { m_listNotifier.push_back(interface); }\
+		ddVoid remove(dd##x::interface * interface) {\
+			std::list<dd##x::interface *>::iterator it = m_listNotifier.begin();\
+			while ( it != m_listNotifier.end() ) {\
+				if ( *it == interface ) {\
+					m_listNotifier.erase(it);\
+					break;\
+				}\
+				it++;\
+			}\
+		}\
+	private: std::list<dd##x::interface *> m_listNotifier;\
+	};\
+	dd##x::interface::interface() { ddGlobalInstance<dd##x##Instance>::instance()->add(this); }\
+	dd##x::interface::~interface() { ddGlobalInstance<dd##x##Instance>::instance()->remove(this); }
+#define dd_service_callback(x, f) do {\
+		std::list<dd##x::interface *>::iterator it = m_listNotifier.begin();\
+		while ( it != m_listNotifier.end() ) { (*it)->f; it++; }\
+	} while(0)
+#define dd_switch_start(x) dd_service_instance(x) \
+	ddVoid dd##x##Instance::onProtocol(ddCommand& cmd) { switch ( cmd.command() ) {
+#define dd_switch_case(x, iocode, f) case dd##x##Device::iocode: dd_service_callback(x, f); break;
+#define dd_switch_end()  default: break; } } 
+#define dd_switch_case2(x, iocode) case dd##x##Device::iocode: 
 #endif //dd_type.h
